@@ -1,6 +1,15 @@
 #include "../include/plataniumv3launcher.hpp"
 #include <karlafont.h>
 
+const std::string get_window_title(void)
+{
+	if (!current_epic_account) {
+		return "Connect to Epic Games";
+	}
+
+	return "Platanium V3";
+}
+
 bool create_window(GLFWwindow** lpWindow)
 {
 	if (!lpWindow)
@@ -15,7 +24,7 @@ bool create_window(GLFWwindow** lpWindow)
 		return false;
 	}
 
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	//glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	GLFWwindow* window = *lpWindow = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
 	if (window == nullptr)
@@ -49,12 +58,17 @@ void initialize_imgui(GLFWwindow* window)
 void initialize_styles(void)
 {
 	ImGui::StyleColorsClassic();
-	ImGuiStyle style = ImGui::GetStyle();
 	
 	ImFontConfig font_cfg;
 	font_cfg.FontDataOwnedByAtlas = false;
-	ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(karla_compressed_data, karla_compressed_size, 17.f, &font_cfg);
+	ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(karla_compressed_data, karla_compressed_size, 16.f, &font_cfg);
 	ImGui::MergeIconsWithLatestFont(16.f, false);
+	
+	ImGui::GetStyle().WindowTitleAlign = { 0.5f,0.5f };
+	ImGui::GetStyle().FrameRounding = 5.f;
+		
+	ImVec4* colors = ImGui::GetStyle().Colors;
+	colors[ImGuiCol_WindowBg] = { 0.094f, 0.094f,0.094f,1.f };
 	spdlog::info("Initialized styles successfully");
 }
 
@@ -75,6 +89,7 @@ void window_loop(GLFWwindow* window)
 		int display_w, display_h;
 		glfwGetFramebufferSize(window, &display_w, &display_h);
 		glViewport(0, 0, display_w, display_h);
+		glClearColor(0.19f, 0.19f, 0.19f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -84,6 +99,8 @@ void window_loop(GLFWwindow* window)
 
 void cleanup_window(GLFWwindow* window)
 {
+	delete* current_epic_account;
+
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

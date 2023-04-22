@@ -2,6 +2,7 @@
 
 int main(void)
 {
+	spdlog::set_level(spdlog::level::level_enum::trace);
 	GLFWwindow* window;
 	if (!create_window(&window))
 	{
