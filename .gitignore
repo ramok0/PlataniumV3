@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 /PlataniumV3Launcher/x64/*
+
+config.json
