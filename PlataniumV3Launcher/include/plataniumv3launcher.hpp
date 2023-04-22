@@ -12,6 +12,7 @@
 #include <glfw/glfw3native.h>
 #include <nlohmann/json.hpp>
 
+#include <fstream>
 #include <string>
 #include <filesystem>
 #pragma comment(lib, "lib/glfw/glfw3.lib")
@@ -94,6 +95,12 @@ bool epic_login_with_authorization_code(std::string& authorizationCode, epic_acc
 //login epic with deviceAuth
 bool epic_login_with_device_auth(epic_device_auth_t device_auth, epic_account_t* out);
 
+//create epic device auth
+bool epic_create_device_auth(epic_device_auth_t* out);
+
+//generates the bearer authorization header
+std::string epic_generate_bearer_authorization(void);
+
 //create basic authoirization
 std::string epic_create_basic_authorization(std::string client_id, std::string client_secret);
 
@@ -103,11 +110,26 @@ bool parse_epic_account(nlohmann::json& document, epic_account_t* out);
 //parse nlohmann::json to configuration_t
 bool parse_configuration(nlohmann::json& document, configuration_t* out);
 
+//parse nlohmann::json to epic_device_auth_t
+bool parse_deviceauth(nlohmann::json& document, epic_device_auth_t* out);
+
 /*
 fortnite client related functions
 */
 
 //find fortnite installation path
 bool fortnite_find_default_installation_path(fs::path& fortnite_out_path);
+
+/*
+configuration related functions
+*/
+
+void create_default_config(void);
+
+bool config_exists(void);
+
+void read_config(void);
+
+void write_configuration(void);
 
 #endif

@@ -7,7 +7,12 @@ static bool jsonExists(nlohmann::json& document, const std::string key)
 
 #define json_get(document, key, type, out) \
 	if(document.find(key) != document.end())\
-		out = document[key].get<type>();
+	{\
+		out = document[key].get<type>();\
+	}\
+	else {\
+		return false;\
+	}
 
 
 bool parse_epic_account(nlohmann::json& document, epic_account_t* out)
@@ -32,8 +37,31 @@ bool parse_epic_account(nlohmann::json& document, epic_account_t* out)
 	return true;
 }
 
+bool parse_deviceauth(nlohmann::json& document, epic_device_auth_t* out)
+{
+	json_get(document, "deviceId", std::string, out->device_id);
+	json_get(document, "accountId", std::string, out->account_id);
+	json_get(document, "secret", std::string, out->secret);
+
+	return true;
+}
+
 bool parse_configuration(nlohmann::json& document, configuration_t* out)
 {
-	throw std::runtime_error("Non-implemented");
-	return false;
+		json_get(document, "disableSSL", bool, out->disableSSL)
+		json_get(document, "detourURL", bool, out->detourURL)
+		json_get(document, "useProxy", bool, out->useProxy)
+		json_get(document, "forwardHost", std::string, out->forwardHost)
+		json_get(document, "forwardProxy", std::string, out->forwardProxy)
+		json_get(document, "forwardPort", std::string, out->forwardPort)
+		json_get(document, "fortnite_path", std::string, out->fortnite_path)
+
+		if (document.find("device_auth") != document.end())
+		{
+			json_get(document["device_auth"], "account_id", std::string, out->deviceAuth.account_id);
+			json_get(document["device_auth"], "device_id", std::string, out->deviceAuth.device_id);
+			json_get(document["device_auth"], "secret", std::string, out->deviceAuth.secret);
+		}
+
+		return true;
 }

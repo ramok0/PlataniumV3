@@ -1,0 +1,14 @@
+{
+    "detourURL": false,
+    "device_auth": {
+        "account_id": "1bf5a7df2d41459f834f38994a290e15",
+        "device_id": "437d7569024347bca91890e87a5da88e",
+        "secret": "4YEDPCDBBDP434URCLSPQW6G6K5QVCDA"
+    },
+    "disableSSL": false,
+    "fortnite_path": "C:/Program Files/Epic Games/Fortnite",
+    "forwardHost": "",
+    "forwardPort": "",
+    "forwardProxy": "",
+    "useProxy": false
+}

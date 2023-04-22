@@ -14,7 +14,7 @@ namespace ImGui {
 
 void render_epic_games_login_form(void)
 {
-	constexpr ImVec2 buttonSize = { 140.f, 25.f };
+	static bool rememberMe = true;
 	static const char* text = "Authorization Code";
 	static char buf[33];
 
@@ -30,6 +30,8 @@ void render_epic_games_login_form(void)
 	ImGui::Align(inputTextWidth);
 	ImGui::InputText("##code", buf, sizeof(buf));
 
+	ImVec2 buttonSize = { 150.f - (ImGui::GetStyle().ItemSpacing.x / 2), 25.f };
+
 	ImGui::Align(ImGui::GetStyle().ItemSpacing.x + (buttonSize.x * 2));
 
 	if (ImGui::Button("Login", buttonSize))
@@ -40,6 +42,18 @@ void render_epic_games_login_form(void)
 
 		if (epic_login_with_authorization_code(authorizationCode, account_buffer))
 		{
+			epic_device_auth_t deviceAuth;
+			if (rememberMe)
+			{
+				if (epic_create_device_auth(&deviceAuth))
+				{
+					g_configuration->deviceAuth = deviceAuth;
+					write_configuration();
+				}
+				else {
+					ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to create device_auth, 'remember be' will not work !" });
+				}
+			}
 			ImGui::InsertNotification({ ImGuiToastType_Success, 3000, std::format("Connected as {}", account_buffer->display_name).c_str()});
 		}
 		else {
@@ -53,6 +67,9 @@ void render_epic_games_login_form(void)
 	{
 		ShellExecuteA(GetDesktopWindow(), "open", std::format(EPIC_GENERATE_AUTHORIZATION_CODE_URL, FORTNITE_IOS_GAME_CLIENT_ID).c_str(), "", "", SW_SHOW);
 	}
+
+	ImGui::Align(ImGui::GetStyle().ItemSpacing.x + (buttonSize.x * 2));
+	ImGui::Checkbox("Remember me", &rememberMe);
 }
 
 void gui_render(void)
