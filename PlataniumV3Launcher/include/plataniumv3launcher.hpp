@@ -16,6 +16,9 @@ constexpr const int WINDOW_HEIGHT = 600;
 constexpr const char* WINDOW_TITLE = "PlataniumV3 Launcher";
 constexpr ImGuiWindowFlags WINDOW_FLAGS = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
 
+constexpr const char* FORTNITE_IOS_GAME_CLIENT_ID = "3446cd72694c4a4485d81b77adbb2141";
+constexpr const char* FORTNITE_IOS_GAME_CLIENT_SECRET = "9209d4a5e25a457fb9b07489d313b41a";
+
 //structures
 
 struct epic_account_t {
