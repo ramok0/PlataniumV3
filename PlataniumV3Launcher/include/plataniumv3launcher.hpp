@@ -68,7 +68,8 @@ bool epic_login_with_authorization_code(std::string& authorizationCode, epic_acc
 //login epic with deviceAuth
 bool epic_login_with_device_auth(epic_device_auth_t& device_auth, epic_account_t& out);
 
-
+//create basic authoirization
+std::string epic_create_basic_authorization(std::string& client_id, std::string& client_secret);
 
 //parse nlohmann::json to epic_account_t
 bool parse_epic_account(nlohmann::json& document, epic_account_t& out);
