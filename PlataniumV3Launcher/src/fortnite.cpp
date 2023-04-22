@@ -31,6 +31,7 @@ bool fortnite_find_default_installation_path(fs::path& fortnite_out_path)
 		if (installation.find("InstallLocation") == installation.end()) break;
 
 		std::string installLocation = installation["InstallLocation"].get<std::string>();
+		spdlog::info("Found Fortnite install location => {}", installLocation);
 		fortnite_out_path = fs::path(installLocation);
 		return true;
 	}

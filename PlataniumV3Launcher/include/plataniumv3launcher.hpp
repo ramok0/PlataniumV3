@@ -124,12 +124,13 @@ bool fortnite_find_default_installation_path(fs::path& fortnite_out_path);
 configuration related functions
 */
 
+//create the default config file
 void create_default_config(void);
-
+//a simple function to determine if the config file exists
 bool config_exists(void);
-
+//read and parse config to g_configuration
 void read_config(void);
-
+//write the configuration file
 void write_configuration(void);
 
 #endif
