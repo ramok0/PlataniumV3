@@ -12,8 +12,8 @@ static bool jsonExists(nlohmann::json& document, const std::string key)
 
 bool parse_epic_account(nlohmann::json& document, epic_account_t* out)
 {
-	int expires_in;
-	int refresh_expires_in;
+	int expires_in = 0;
+	int refresh_expires_in = 0;
 
 	json_get(document, "displayName", std::string, out->display_name);
 	json_get(document, "access_token", std::string, out->access_token);
