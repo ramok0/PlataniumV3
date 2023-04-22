@@ -21,10 +21,25 @@ bool epic_login_with_authorization_code(std::string& authorizationCode, epic_acc
 	return true;
 }
 
-bool epic_login_with_device_auth(epic_device_auth_t& device_auth, epic_account_t& out)
+bool epic_login_with_device_auth(epic_device_auth_t device_auth, epic_account_t* out)
 {
-	throw std::runtime_error("Non-implemented");
-	return false;
+	if (device_auth.account_id.empty() || device_auth.device_id.empty() || device_auth.secret.empty()) return false;
+
+	cpr::Response response = cpr::Post(
+		cpr::Url(EPIC_GENERATE_TOKEN_URL), 
+		cpr::Header{ {"Authorization", epic_create_basic_authorization(FORTNITE_IOS_GAME_CLIENT_ID, FORTNITE_IOS_GAME_CLIENT_SECRET)} }, 
+		cpr::Payload{ {"grant_type", "device_auth"}, {"account_id", device_auth.account_id}, {"device_id", device_auth.device_id}, {"secret", device_auth.secret } 
+	});
+
+	if (response.status_code != 200) return false;
+	
+	nlohmann::json body = nlohmann::json::parse(response.text);
+
+	if (!parse_epic_account(body, out)) return false;
+
+	*current_epic_account = out;
+
+	return true;
 }
 
 std::string epic_create_basic_authorization(std::string client_id, std::string client_secret)

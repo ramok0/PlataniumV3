@@ -29,6 +29,7 @@ constexpr const char* EPIC_LAUNCHER_INSTALLED_PATH = "C:\\ProgramData\\Epic\\Unr
 constexpr const char* FORTNITE_ITEM_ID = "4fe75bbc5a674f4f9b356b5c90567da5";
 constexpr const char* EPIC_GENERATE_AUTHORIZATION_CODE_URL = "https://www.epicgames.com/id/api/redirect?clientId={}&responseType=code";
 constexpr const char* EPIC_GENERATE_TOKEN_URL = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token";
+constexpr const char* EPIC_GENERATE_DEVICE_AUTH = "https://account-public-service-prod.ol.epicgames.com/account/api/public/account/{}/deviceAuth";
 
 //structures
 
@@ -60,6 +61,8 @@ struct configuration_t {
 	epic_device_auth_t deviceAuth;
 };
 
+inline configuration_t* g_configuration = new configuration_t();
+
 /*
 window related functions
 */
@@ -89,7 +92,7 @@ epic api related functions
 bool epic_login_with_authorization_code(std::string& authorizationCode, epic_account_t* out);
 
 //login epic with deviceAuth
-bool epic_login_with_device_auth(epic_device_auth_t& device_auth, epic_account_t& out);
+bool epic_login_with_device_auth(epic_device_auth_t device_auth, epic_account_t* out);
 
 //create basic authoirization
 std::string epic_create_basic_authorization(std::string client_id, std::string client_secret);
