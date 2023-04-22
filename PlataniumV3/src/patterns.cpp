@@ -13,7 +13,7 @@ void find_patterns(void)
 	addresses::unsafeenvironnement = Memcury::Scanner::FindStringRef(UNSAFE_ENVIRONNEMENT).ScanFor({ WILDCARD, WILDCARD, WILDCARD, 0x24, WILDCARD, 0x55 }, false).GetAs<void*>();
 	addresses::get_engine_version = Memcury::Scanner::FindStringRef(GET_ENGINE_VERSION).ScanFor({ 0xE8, WILDCARD,WILDCARD,WILDCARD,WILDCARD, 0x4C, 0x8B }, false).RelativeOffset(1).GetAs<void*>();
 
-	addresses::game_engine = Memcury::Scanner::FindStringRef(GENGINE_STRING)
+//	addresses::game_engine = Memcury::Scanner::FindStringRef(GENGINE_STRING)
 
 	log_pointer("curl_easy_setopt", addresses::curl_easy_setopt, true);
 	log_pointer("curl_setopt", addresses::curl_setopt, true);

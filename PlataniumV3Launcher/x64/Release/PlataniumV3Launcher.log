@@ -1,0 +1,30 @@
+﻿  gui.cpp
+  main.cpp
+  window.cpp
+  Génération de code en cours
+  73 of 5145 functions ( 1.4%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    72 functions had inline decision re-evaluated but remain unchanged
+  Fin de la génération du code
+glfw3.lib(input.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(input.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(window.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(window.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(monitor.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(monitor.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(init.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(init.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_window.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(win32_window.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(context.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(context.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_time.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(win32_time.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_thread.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(win32_thread.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(platform.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(platform.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(vulkan.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(vulkan.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_init.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(win32_init.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_monitor.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(win32_monitor.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(wgl_context.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(wgl_context.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(egl_context.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(egl_context.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(osmesa_context.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(osmesa_context.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(null_init.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(null_init.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_module.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(win32_module.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_joystick.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(win32_joystick.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(null_monitor.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(null_monitor.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(null_window.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(null_window.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(null_joystick.c.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(null_joystick.c.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+  PlataniumV3Launcher.vcxproj -> F:\dev\PlataniumV3\x64\Release\PlataniumV3Launcher.exe
