@@ -9,15 +9,20 @@
 #include <nlohmann/json.hpp>
 
 #include <string>
+#include <filesystem>
 #pragma comment(lib, "lib/glfw/glfw3.lib")
 
+namespace fs = std::filesystem;
+
+//constants
 constexpr const int WINDOW_WIDTH = 800;
 constexpr const int WINDOW_HEIGHT = 600;
 constexpr const char* WINDOW_TITLE = "PlataniumV3 Launcher";
 constexpr ImGuiWindowFlags WINDOW_FLAGS = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
-
 constexpr const char* FORTNITE_IOS_GAME_CLIENT_ID = "3446cd72694c4a4485d81b77adbb2141";
 constexpr const char* FORTNITE_IOS_GAME_CLIENT_SECRET = "9209d4a5e25a457fb9b07489d313b41a";
+constexpr const char* EPIC_LAUNCHER_INSTALLED_PATH = "C:\\ProgramData\\Epic\\UnrealEngineLauncher\\LauncherInstalled.dat";
+constexpr const char* FORTNITE_ITEM_ID = "4fe75bbc5a674f4f9b356b5c90567da5";
 
 //structures
 
@@ -76,3 +81,10 @@ std::string epic_create_basic_authorization(std::string& client_id, std::string&
 
 //parse nlohmann::json to epic_account_t
 bool parse_epic_account(nlohmann::json& document, epic_account_t& out);
+
+/*
+fortnite client related functions
+*/
+
+
+bool fortnite_find_default_installation_path(fs::path& fortnite_out_path);
