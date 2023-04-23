@@ -5,6 +5,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+#include <imgui/imgui_internal.h>
 #include <imgui_notify.h>
 #include <imguifilebrowser.h>
 #include <spdlog/spdlog.h>
@@ -72,6 +73,8 @@ window related functions
 const std::string get_window_title(void);
 //render epicgameslogin form
 void render_epic_games_login_form(void);
+//render main form
+void render_main_form(void);
 //init glfw and create window
 bool create_window(GLFWwindow** lpWindow);
 //init imgui
@@ -119,6 +122,9 @@ fortnite client related functions
 
 //find fortnite installation path
 bool fortnite_find_default_installation_path(fs::path& fortnite_out_path);
+
+//verify fortnite directory
+bool verify_fortnite_directory(fs::path directory);
 
 /*
 configuration related functions

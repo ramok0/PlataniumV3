@@ -40,3 +40,13 @@ bool fortnite_find_default_installation_path(fs::path& fortnite_out_path)
 	stream.close();
 	return false;
 }
+
+
+bool verify_fortnite_directory(fs::path directory)
+{
+	if (!fs::exists(directory / "FortniteGame") && fs::exists(directory / "Engine")) {
+		return false;
+	}
+
+	return fs::exists(directory / "FortniteGame" / "Binaries" / "Win64" / "FortniteClient-Win64-Shipping.exe");
+}
