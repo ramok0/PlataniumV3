@@ -71,7 +71,15 @@ void render_main_form(void)
 	ImGui::Checkbox("Disable SSL", &g_configuration->disableSSL);
 	ImGui::SameLine();
 	ImGui::SetCursorPosX(originalPosX + off + (boutonSize.x + style.ItemSpacing.x) * 2);
-	ImGui::Checkbox("Use Proxy", &g_configuration->useProxy);
+	ImGui::Checkbox("Use Proxy", &g_configuration->useProxy);	
+	
+	ImGui::SetCursorPosX(originalPosX + off);
+	ImGui::Checkbox("Dump AES (experimental)", &g_configuration->useProxy);
+
+	ImGui::SetCursorPosX(originalPosX + off);
+	ImGui::Checkbox("Disable Signature Checks (experimental)", &g_configuration->should_check_pak);
+
+
 
 
 
@@ -194,8 +202,8 @@ void gui_render(void)
 		fileDialog.ClearSelected();
 	}
 
-	ImGuiStyle& styles = ImGui::GetStyle();
-	ImGui::ShowStyleEditor(&styles);
+	/*ImGuiStyle& styles = ImGui::GetStyle();
+	ImGui::ShowStyleEditor(&styles);*/
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 5.f); // Round borders
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(43.f / 255.f, 43.f / 255.f, 43.f / 255.f, 100.f / 255.f)); // Background color
 	ImGui::RenderNotifications(); // <-- Here we render all notifications

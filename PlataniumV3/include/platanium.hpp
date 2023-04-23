@@ -15,6 +15,7 @@ static const wchar_t* REQUEST_EXIT_WITH_STATUS = L"Cannot find a compatible Vulk
 static const wchar_t* UNSAFE_ENVIRONNEMENT = L"UnsafeEnvironment_Title";
 static const wchar_t* GET_ENGINE_VERSION = L"unreal-v%i-%s.dmp";
 static const wchar_t* GENGINE_STRING = L"Invalid Engine used, must be FortEngine or FortUnrealEdEngine";
+static const wchar_t* SHOULD_CHECK_PAK = L"heckpak";
 
 //ue4 structures
 struct FEngineVersionBase {
@@ -31,12 +32,55 @@ struct FEngineVersionBase {
 	uint32_t Changelist = 0;
 };
 
+enum class EIoErrorCode
+{
+	Ok,
+	Unknown,
+	InvalidCode,
+	Cancelled,
+	FileOpenFailed,
+	FileNotOpen,
+	ReadError,
+	WriteError,
+	NotFound,
+	CorruptToc,
+	UnknownChunkID,
+	InvalidParameter,
+	SignatureError,
+	InvalidEncryptionKey,
+	CompressionError,
+};
+
+
+class FIoStatus
+{
+	static constexpr int32_t MaxErrorMessageLength = 128;
+	using FErrorMessage = TCHAR[MaxErrorMessageLength];
+
+public:
+	FIoStatus(EIoErrorCode code, FErrorMessage text)
+	{
+		this->ErrorCode = code;
+		wcscpy_s(this->ErrorMessage, sizeof(ErrorMessage), text);
+	}
+
+private:
+
+
+	EIoErrorCode	ErrorCode = EIoErrorCode::Ok;
+	FErrorMessage	ErrorMessage;
+
+	friend class FIoStatusBuilder;
+};
+
 namespace addresses {
 	inline void* curl_easy_setopt;
 	inline void* curl_setopt;
 	inline void* request_exit_with_status;
 	inline void* unsafeenvironnement;
 	inline void* get_engine_version;
+	inline void* should_check_pak;
+	inline void* validate_container_signature;
 	inline void* game_engine;
 }
 
@@ -47,12 +91,16 @@ namespace native {
 	inline void(__fastcall *request_exit_with_status)(bool, uint8_t);
 	inline void* (*get_engine_version)();
 	inline __int64(__fastcall* unsafe_environnement)(__int64* a1, char a2, __int64 a3, char a4);
+	inline __int64(*should_check_pak)(void);
+	inline void*(__fastcall *fiostatus_tostring)(void*, void*);
+	inline FIoStatus(__fastcall* ValidateContainerSignature)(__int64 a1, __int64 a2, __int64 a3, __int64 a4, __int64 a5, __int64 a6);
 }
 
 namespace configuration {
 	inline bool disableSSL = false;
 	inline bool detourURL = false;
 	inline bool useProxy = false;
+	inline bool bypass_pak_checks = false;
 	inline std::string forwardProxy;
 	inline std::string forwardHost;
 	inline std::string forwardPort;

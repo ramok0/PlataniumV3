@@ -12,6 +12,7 @@ void create_default_config(void)
 	g_configuration->detourURL = false;
 	g_configuration->disableSSL = false;
 	g_configuration->useProxy = false;
+	g_configuration->should_check_pak = false;
 	g_configuration->forwardHost = "";
 	g_configuration->forwardPort = 0;
 	g_configuration->forwardProxy = "";
@@ -67,7 +68,8 @@ void write_configuration(void)
 		{"forwardProxy", g_configuration->forwardProxy},
 		{"forwardHost", g_configuration->forwardHost},
 		{"forwardPort", g_configuration->forwardPort},
-		{"fortnite_path", g_configuration->fortnite_path}
+		{"fortnite_path", g_configuration->fortnite_path},
+		{"should_check_pak", g_configuration->should_check_pak}
 	};
 
 	if (!g_configuration->deviceAuth.account_id.empty() && !g_configuration->deviceAuth.device_id.empty() && !g_configuration->deviceAuth.secret.empty())

@@ -94,12 +94,28 @@ __int64 hk_unsafe_environnement(__int64* a1, char a2, __int64 a3, char a4)
 	return 0;
 }
 
+
+inline FIoStatus hkValidateContainerSignature(__int64 a1, __int64 a2, __int64 a3, __int64 a4, __int64 a5, __int64 a6)
+{
+	std::cout << "[plataniumv3] - replaced ValidateContainerSignature response succesfully" << std::endl;
+	return { EIoErrorCode::Ok, (TCHAR*)TEXT("OK")};
+}
+
 void place_hooks(void)
 {
 	MH_Initialize();
 
-	MH_CreateHook((void*&)native::curl_easy_setopt, hk_curl_easy_setopt, nullptr);
+	if (configuration::detourURL || configuration::disableSSL || configuration::useProxy)
+	{
+		MH_CreateHook((void*&)native::curl_easy_setopt, hk_curl_easy_setopt, nullptr);
+	}
+
 	MH_CreateHook((void*&)native::request_exit_with_status, hk_request_exit_with_status, nullptr);
 	MH_CreateHook((void*&)native::unsafe_environnement, hk_unsafe_environnement, nullptr);
+	if (configuration::bypass_pak_checks)
+	{
+		//ValidateContainerSignature
+		MH_CreateHook((void*&)native::ValidateContainerSignature, hkValidateContainerSignature, nullptr);
+	}
 	MH_EnableHook(MH_ALL_HOOKS);
 }

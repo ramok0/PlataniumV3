@@ -58,6 +58,7 @@ struct configuration_t {
 	bool disableSSL = false;
 	bool detourURL = false;
 	bool useProxy = false;
+	bool should_check_pak = false;
 	std::string forwardProxy;
 	std::string forwardHost;
 	int forwardPort;

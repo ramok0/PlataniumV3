@@ -69,6 +69,18 @@ bool start_fortnite_and_inject_dll(void)
 	std::string exchangeCode;
 	if (!epic_create_exchange_code(exchangeCode))
 	{
+		delete* current_epic_account;
+		*current_epic_account = nullptr;
+		if (!g_configuration->deviceAuth.account_id.empty() && !g_configuration->deviceAuth.device_id.empty() && !g_configuration->deviceAuth.secret.empty())
+		{
+			epic_account_t* user = new epic_account_t();
+			if (!epic_login_with_device_auth(g_configuration->deviceAuth, user))
+			{
+				spdlog::error("Failed to re-auth");
+				ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to re-auth using deviceauth." });
+			}
+		}
+
 		spdlog::error("Failed to create exchange code");
 		ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to create exchange code" });
 		return false;
@@ -98,7 +110,7 @@ bool start_fortnite_and_inject_dll(void)
 	CloseHandle(processInfo.hProcess);
 	CloseHandle(processInfo.hThread);
 
-	std::this_thread::sleep_for(std::chrono::seconds(4));
+	//std::this_thread::sleep_for(std::chrono::seconds(4));
 
 	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processInfo.dwProcessId);
 
@@ -142,7 +154,7 @@ bool start_fortnite_and_inject_dll(void)
 	CloseHandle(hLoadThread);
 
 	spdlog::info("Started Fortnite and injected DLL successfully, fortnite PID: {}", processInfo.dwProcessId);
-	ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to inject DLL" });
+	ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Started Fortnite and Injected DLL successfully !" });
 
 	return true;
 }

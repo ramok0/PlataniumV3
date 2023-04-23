@@ -53,6 +53,7 @@ void read_config(std::filesystem::path config_path)
 		out = config[key].get<T>();
 	};
 
+	readData("should_check_pak", configuration::bypass_pak_checks);
 	readData("detourURL", configuration::detourURL);
 	readData("useProxy", configuration::useProxy);
 	readData("disableSSL", configuration::disableSSL);
