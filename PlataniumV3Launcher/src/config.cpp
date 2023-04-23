@@ -13,7 +13,7 @@ void create_default_config(void)
 	g_configuration->disableSSL = false;
 	g_configuration->useProxy = false;
 	g_configuration->forwardHost = "";
-	g_configuration->forwardPort = "";
+	g_configuration->forwardPort = 0;
 	g_configuration->forwardProxy = "";
 	
 	fs::path outFortntePath;

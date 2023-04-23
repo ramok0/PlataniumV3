@@ -17,11 +17,10 @@ void render_main_form(void)
 {
 	static char buf1[MAX_PATH];
 	static char buf2[MAX_PATH];
-	static int fPort = 0;
 	const float inputFloat = 370.f;
 
 
-	const std::string text = std::format("Hi {}, welcome to PlataniumV3 !\nThis launcher has been made from scratch by github.com/Ramokprout", (*current_epic_account)->display_name);
+	const std::string text = std::format("Hi {}, welcome to PlataniumV3 !\nThis launcher has been made from scratch by github.com/Ramokprout\nInspired by PlataniumV3 by kem0x and Platanium by WorkingRobot", (*current_epic_account)->display_name);
 
 	ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
 
@@ -52,7 +51,7 @@ void render_main_form(void)
 	ImGui::InputText("Forward Host", buf1, sizeof(buf1), g_configuration->detourURL ? 0 : ImGuiInputTextFlags_ReadOnly);
 	ImGui::Align(inputFloat);
 	ImGui::SetNextItemWidth(inputFloat);
-	ImGui::InputInt("Forward Port", &fPort, 1, 100, g_configuration->detourURL ? 0 : ImGuiInputTextFlags_ReadOnly);
+	ImGui::InputInt("Forward Port", &g_configuration->forwardPort, 1, 100, g_configuration->detourURL ? 0 : ImGuiInputTextFlags_ReadOnly);
 
 	if (!g_configuration->detourURL)
 		ImGui::EndDisabled();
@@ -78,7 +77,10 @@ void render_main_form(void)
 
 	ImGui::Align(boutonSize.x * 3 + ImGui::GetStyle().ItemSpacing.x * 2);
 
-	ImGui::Button("Start Fortnite", boutonSize);
+	if (ImGui::Button("Start Fortnite", boutonSize))
+	{
+		std::thread(start_fortnite_and_inject_dll).detach();
+	}
 	ImGui::SameLine();
 	if (ImGui::Button("Edit Fortnite Path", boutonSize))
 	{

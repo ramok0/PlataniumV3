@@ -76,3 +76,22 @@ std::string epic_create_basic_authorization(std::string client_id, std::string c
 	return std::format("Basic {}", macaron::Base64::Encode(client_id + ":" + client_secret));
 }
 
+bool epic_create_exchange_code(std::string& out)
+{
+	cpr::Response response = cpr::Get(
+		cpr::Url(EPIC_GENERATE_EXCHANGE_CODE),
+		cpr::Header{ {"Authorization", epic_generate_bearer_authorization()} }
+	);
+
+	spdlog::debug("Response => {}", response.text);
+
+	if (response.status_code != 200) return false;
+
+	nlohmann::json body = nlohmann::json::parse(response.text);
+
+	if (body.find("code") == body.end()) return false;
+
+	out = body["code"].get<std::string>();
+
+	return true;
+}

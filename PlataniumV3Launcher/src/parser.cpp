@@ -53,7 +53,7 @@ bool parse_configuration(nlohmann::json& document, configuration_t* out)
 		json_get(document, "useProxy", bool, out->useProxy)
 		json_get(document, "forwardHost", std::string, out->forwardHost)
 		json_get(document, "forwardProxy", std::string, out->forwardProxy)
-		json_get(document, "forwardPort", std::string, out->forwardPort)
+		json_get(document, "forwardPort", int, out->forwardPort)
 		json_get(document, "fortnite_path", std::string, out->fortnite_path)
 
 		if (document.find("device_auth") != document.end())

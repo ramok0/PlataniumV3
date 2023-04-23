@@ -29,10 +29,12 @@ constexpr const char* FORTNITE_IOS_GAME_CLIENT_ID = "3446cd72694c4a4485d81b77adb
 constexpr const char* FORTNITE_IOS_GAME_CLIENT_SECRET = "9209d4a5e25a457fb9b07489d313b41a";
 constexpr const char* EPIC_LAUNCHER_INSTALLED_PATH = "C:\\ProgramData\\Epic\\UnrealEngineLauncher\\LauncherInstalled.dat";
 constexpr const char* FORTNITE_ITEM_ID = "4fe75bbc5a674f4f9b356b5c90567da5";
+
+
 constexpr const char* EPIC_GENERATE_AUTHORIZATION_CODE_URL = "https://www.epicgames.com/id/api/redirect?clientId={}&responseType=code";
 constexpr const char* EPIC_GENERATE_TOKEN_URL = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token";
 constexpr const char* EPIC_GENERATE_DEVICE_AUTH = "https://account-public-service-prod.ol.epicgames.com/account/api/public/account/{}/deviceAuth";
-
+constexpr const char* EPIC_GENERATE_EXCHANGE_CODE = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/exchange";
 //structures
 
 struct epic_account_t {
@@ -58,7 +60,7 @@ struct configuration_t {
 	bool useProxy = false;
 	std::string forwardProxy;
 	std::string forwardHost;
-	std::string forwardPort;
+	int forwardPort;
 	std::string fortnite_path;
 	epic_device_auth_t deviceAuth;
 };
@@ -107,6 +109,11 @@ std::string epic_generate_bearer_authorization(void);
 //create basic authoirization
 std::string epic_create_basic_authorization(std::string client_id, std::string client_secret);
 
+//create exchange code
+bool epic_create_exchange_code(std::string& out);
+
+/*parsers related functions*/
+
 //parse nlohmann::json to epic_account_t
 bool parse_epic_account(nlohmann::json& document, epic_account_t* out);
 
@@ -122,7 +129,10 @@ fortnite client related functions
 
 //find fortnite installation path
 bool fortnite_find_default_installation_path(fs::path& fortnite_out_path);
-
+//start fortnite client and injects dll
+bool start_fortnite_and_inject_dll(void);
+//generate arguments to start fortnite
+std::string generate_fortnite_start_arguments(fs::path fortnitePath, fs::path configPath, std::string exchangeCode);
 //verify fortnite directory
 bool verify_fortnite_directory(fs::path directory);
 

@@ -25,6 +25,7 @@ bool get_config_path(std::filesystem::path& out)
 			if (key.contains(L"plataniumconfigpath"))
 			{
 				std::filesystem::path configPath = std::filesystem::path(value);
+				std::cout << configPath.string() << std::endl;
 				if (std::filesystem::exists(configPath))
 				{
 					LocalFree(szArglist);
