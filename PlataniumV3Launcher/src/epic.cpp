@@ -1,5 +1,4 @@
 #include "../include/plataniumv3launcher.hpp"
-#include <base64.hpp>
 #include <cpr/cpr.h>
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -27,10 +26,18 @@ bool epic_login_with_device_auth(epic_device_auth_t device_auth, epic_account_t*
 {
 	if (device_auth.account_id.empty() || device_auth.device_id.empty() || device_auth.secret.empty()) return false;
 
+	std::string secretPlainText;
+
+	if (!uncipher_secret(secretPlainText))
+	{
+		spdlog::error("Failed to decrypt device_auth=>'secret'");
+		return false;
+	}
+
 	cpr::Response response = cpr::Post(
 		cpr::Url(EPIC_GENERATE_TOKEN_URL), 
 		cpr::Header{ {"Authorization", epic_create_basic_authorization(FORTNITE_IOS_GAME_CLIENT_ID, FORTNITE_IOS_GAME_CLIENT_SECRET)} }, 
-		cpr::Payload{ {"grant_type", "device_auth"}, {"account_id", device_auth.account_id}, {"device_id", device_auth.device_id}, {"secret", device_auth.secret } 
+		cpr::Payload{ {"grant_type", "device_auth"}, {"account_id", device_auth.account_id}, {"device_id", device_auth.device_id}, {"secret", secretPlainText }
 	});
 
 	if (response.status_code != 200) return false;
@@ -61,7 +68,10 @@ bool epic_create_device_auth(epic_device_auth_t* out)
 
 	nlohmann::json json = nlohmann::json::parse(response.text);
 
-	if (!parse_deviceauth(json, out)) return false;
+	std::string secretPlainText;
+	if (!parse_deviceauth(json, out, secretPlainText) || !cipher_secret(out, secretPlainText)) return false;
+
+	secretPlainText.clear();
 
 	return true;
 }
@@ -73,7 +83,7 @@ std::string epic_generate_bearer_authorization(void)
 
 std::string epic_create_basic_authorization(std::string client_id, std::string client_secret)
 {
-	return std::format("Basic {}", macaron::Base64::Encode(client_id + ":" + client_secret));
+	return std::format("Basic {}", base64_encode(client_id + ":" + client_secret));
 }
 
 bool epic_create_exchange_code(std::string& out)

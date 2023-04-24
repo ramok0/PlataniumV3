@@ -1,13 +1,18 @@
 #include "../include/plataniumv3launcher.hpp"
 
 namespace ImGui {
-	void Align(float width, float alignment = 0.5f)
+	void Align(float width, bool set_next_item_with = true, float alignment = 0.5f)
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
 		float avail = ImGui::GetContentRegionAvail().x;
 		float off = (avail - width) * alignment;
 		if (off > 0.0f)
+		{
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+
+			if(set_next_item_with)
+				ImGui::SetNextItemWidth(width);
+		}
 	}
 }
 
@@ -35,7 +40,6 @@ void render_main_form(void)
 
 
 	ImGui::Align(inputFloat);
-	ImGui::SetNextItemWidth(inputFloat);
 	if (!g_configuration->useProxy)
 		ImGui::BeginDisabled();
 	ImGui::InputText("Detour Proxy", buf2, sizeof(buf2), g_configuration->useProxy ? 0 : ImGuiInputTextFlags_ReadOnly);
@@ -47,10 +51,8 @@ void render_main_form(void)
 		ImGui::BeginDisabled();
 
 	ImGui::Align(inputFloat);
-	ImGui::SetNextItemWidth(inputFloat);
 	ImGui::InputText("Forward Host", buf1, sizeof(buf1), g_configuration->detourURL ? 0 : ImGuiInputTextFlags_ReadOnly);
 	ImGui::Align(inputFloat);
-	ImGui::SetNextItemWidth(inputFloat);
 	ImGui::InputInt("Forward Port", &g_configuration->forwardPort, 1, 100, g_configuration->detourURL ? 0 : ImGuiInputTextFlags_ReadOnly);
 
 	if (!g_configuration->detourURL)
@@ -58,11 +60,11 @@ void render_main_form(void)
 
 	ImGuiStyle& style = ImGui::GetStyle();
 	float avail = ImGui::GetContentRegionAvail().x;
-	float off = (avail - inputFloat) * 0.5;
+	float off = (avail - static_cast<float>(inputFloat)) * 0.5f;
 
 	float originalPosX = ImGui::GetCursorPosX();
 
-	ImVec2 boutonSize = { (inputFloat - (style.ItemSpacing.x * 2)) / 3, 25.f };
+	ImVec2 boutonSize = { (static_cast<float>(inputFloat) - (style.ItemSpacing.x * 2)) / 3, 25.f};
 
 	ImGui::SetCursorPosX(originalPosX + off);
 	ImGui::Checkbox("Detour URL", &g_configuration->detourURL);
@@ -74,16 +76,23 @@ void render_main_form(void)
 	ImGui::Checkbox("Use Proxy", &g_configuration->useProxy);	
 	
 	ImGui::SetCursorPosX(originalPosX + off);
+
 	ImGui::Checkbox("Dump AES (experimental)", &g_configuration->useProxy);
-
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::SetTooltip("This is not implemented yet.");
+	}
 	ImGui::SetCursorPosX(originalPosX + off);
+
 	ImGui::Checkbox("Disable Signature Checks (experimental)", &g_configuration->should_check_pak);
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::SetTooltip("This will probably not work with ancient versions. It works on UE 5.1.1.");
+	}
 
 
 
-
-
-	ImGui::Align(boutonSize.x * 3 + ImGui::GetStyle().ItemSpacing.x * 2);
+	ImGui::Align(boutonSize.x * 3 + ImGui::GetStyle().ItemSpacing.x * 2, false);
 
 	if (ImGui::Button("Start Fortnite", boutonSize))
 	{
@@ -116,11 +125,10 @@ void render_epic_games_login_form(void)
 	ImGui::SetCursorPosY(height / 3);
 
 	//center the "authorization code" text horizontally
-	ImGui::Align(ImGui::CalcTextSize(text).x);
+	ImGui::Align(ImGui::CalcTextSize(text).x, false);
 	ImGui::Text(text);
 
 	//center the text input horizontally
-	ImGui::SetNextItemWidth(inputTextWidth);
 	ImGui::Align(inputTextWidth);
 	ImGui::InputText("##code", buf, sizeof(buf));
 
@@ -128,7 +136,7 @@ void render_epic_games_login_form(void)
 	ImVec2 buttonSize = { (inputTextWidth / 2) - (ImGui::GetStyle().ItemSpacing.x / 2), 25.f };
 
 	//align the button horizontally
-	ImGui::Align(ImGui::GetStyle().ItemSpacing.x + (buttonSize.x * 2));
+	ImGui::Align(ImGui::GetStyle().ItemSpacing.x + (buttonSize.x * 2), false);
 
 	if (ImGui::Button("Login", buttonSize))
 	{
@@ -152,7 +160,7 @@ void render_epic_games_login_form(void)
 			ImGui::InsertNotification({ ImGuiToastType_Success, 3000, std::format("Connected as {}", account_buffer->display_name).c_str() });
 		}
 		else {
-			memset(buf, 0, sizeof(buf));
+			ZeroMemory(buf, sizeof(buf));
 			ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to login to epic games services !" });
 			delete account_buffer;
 		}
@@ -163,8 +171,9 @@ void render_epic_games_login_form(void)
 		//create a web browser instance to the EPIC_GENERATE_AUTHORIZATION_CODE_URL constant
 		ShellExecuteA(GetDesktopWindow(), "open", std::format(EPIC_GENERATE_AUTHORIZATION_CODE_URL, FORTNITE_IOS_GAME_CLIENT_ID).c_str(), "", "", SW_SHOW);
 	}
+
 	//align the checkbox with the inputtext
-	ImGui::Align(ImGui::GetStyle().ItemSpacing.x + (buttonSize.x * 2));
+	ImGui::Align(ImGui::GetStyle().ItemSpacing.x + (buttonSize.x * 2), false);
 	ImGui::Checkbox("Remember me", &rememberMe);
 }
 

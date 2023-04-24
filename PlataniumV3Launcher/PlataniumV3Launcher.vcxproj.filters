@@ -65,5 +65,11 @@
     <ClCompile Include="src\config.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="src\cipher.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\base64\base64.cpp">
+      <Filter>Fichiers sources\lib</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

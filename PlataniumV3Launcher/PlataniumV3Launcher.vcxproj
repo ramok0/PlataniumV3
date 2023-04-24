@@ -150,6 +150,7 @@
     <ClInclude Include="include\plataniumv3launcher.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="lib\base64\base64.cpp" />
     <ClCompile Include="lib\imgui\imgui.cpp" />
     <ClCompile Include="lib\imgui\imgui_demo.cpp" />
     <ClCompile Include="lib\imgui\imgui_draw.cpp" />
@@ -157,6 +158,7 @@
     <ClCompile Include="lib\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="lib\imgui\imgui_tables.cpp" />
     <ClCompile Include="lib\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\cipher.cpp" />
     <ClCompile Include="src\config.cpp" />
     <ClCompile Include="src\epic.cpp" />
     <ClCompile Include="src\fortnite.cpp" />

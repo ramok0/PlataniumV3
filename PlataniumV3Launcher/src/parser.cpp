@@ -37,18 +37,25 @@ bool parse_epic_account(nlohmann::json& document, epic_account_t* out)
 	return true;
 }
 
-bool parse_deviceauth(nlohmann::json& document, epic_device_auth_t* out)
+bool parse_deviceauth(nlohmann::json& document, epic_device_auth_t* out, std::string& secret)
 {
 	json_get(document, "deviceId", std::string, out->device_id);
 	json_get(document, "accountId", std::string, out->account_id);
-	json_get(document, "secret", std::string, out->secret);
+	if (document["secret"].is_string())
+	{
+		json_get(document, "secret", std::string, secret);
+	}
+	else {
+		spdlog::error("Type of deviceauth's secret is not std::string, cannot parse it");
+		return false;
+	}
 
 	return true;
 }
 
 bool parse_configuration(nlohmann::json& document, configuration_t* out)
 {
-		json_get(document, "disableSSL", bool, out->disableSSL)
+	json_get(document, "disableSSL", bool, out->disableSSL)
 		json_get(document, "detourURL", bool, out->detourURL)
 		json_get(document, "useProxy", bool, out->useProxy)
 		json_get(document, "should_check_pak", bool, out->should_check_pak)
@@ -61,8 +68,12 @@ bool parse_configuration(nlohmann::json& document, configuration_t* out)
 		{
 			json_get(document["device_auth"], "account_id", std::string, out->deviceAuth.account_id);
 			json_get(document["device_auth"], "device_id", std::string, out->deviceAuth.device_id);
-			json_get(document["device_auth"], "secret", std::string, out->deviceAuth.secret);
+
+			if (document["device_auth"]["secret"].is_array())
+			{
+				out->deviceAuth.secret = document["device_auth"]["secret"].get<std::vector<uint8_t>>();
+			}
 		}
 
-		return true;
+	return true;
 }

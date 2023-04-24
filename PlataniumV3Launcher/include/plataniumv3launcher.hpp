@@ -12,6 +12,7 @@
 #include <glfw/glfw3.h>
 #include <glfw/glfw3native.h>
 #include <nlohmann/json.hpp>
+#include <base64/base64.hpp>
 
 #include <fstream>
 #include <string>
@@ -51,7 +52,7 @@ inline epic_account_t** current_epic_account = new epic_account_t*();
 struct epic_device_auth_t {
 	std::string device_id;
 	std::string account_id;
-	std::string secret;
+	std::vector<std::uint8_t> secret;
 };
 
 struct configuration_t {
@@ -103,7 +104,6 @@ bool epic_login_with_device_auth(epic_device_auth_t device_auth, epic_account_t*
 
 //create epic device auth
 bool epic_create_device_auth(epic_device_auth_t* out);
-
 //generates the bearer authorization header
 std::string epic_generate_bearer_authorization(void);
 
@@ -122,7 +122,7 @@ bool parse_epic_account(nlohmann::json& document, epic_account_t* out);
 bool parse_configuration(nlohmann::json& document, configuration_t* out);
 
 //parse nlohmann::json to epic_device_auth_t
-bool parse_deviceauth(nlohmann::json& document, epic_device_auth_t* out);
+bool parse_deviceauth(nlohmann::json& document, epic_device_auth_t* out, std::string& secret);
 
 /*
 fortnite client related functions
@@ -149,5 +149,14 @@ bool config_exists(void);
 void read_config(void);
 //write the configuration file
 void write_configuration(void);
+
+/*
+cipher related functions
+*/
+
+//cipher the secret value
+bool cipher_secret(epic_device_auth_t* out, std::string& secret);
+//uncipher the secret value
+bool uncipher_secret(std::string& secret);
 
 #endif
