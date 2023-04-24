@@ -98,10 +98,10 @@ epic api related functions
 
 //login epic with authorizationCode
 bool epic_login_with_authorization_code(std::string& authorizationCode, epic_account_t* out);
-
 //login epic with deviceAuth
 bool epic_login_with_device_auth(epic_device_auth_t device_auth, epic_account_t* out);
-
+//login epic with refresh_token
+bool epic_login_with_refresh_token(void);
 //create epic device auth
 bool epic_create_device_auth(epic_device_auth_t* out);
 //generates the bearer authorization header

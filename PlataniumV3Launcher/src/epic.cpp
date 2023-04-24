@@ -22,6 +22,32 @@ bool epic_login_with_authorization_code(std::string& authorizationCode, epic_acc
 	return true;
 }
 
+bool epic_login_with_refresh_token(void)
+{
+	if (!current_epic_account || !*current_epic_account) return false;
+
+	int timestamp = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+	if ((*current_epic_account)->refresh_expires_at < timestamp) return false;
+
+	cpr::Response response = cpr::Post(
+		cpr::Url(EPIC_GENERATE_TOKEN_URL),
+		cpr::Payload{ 
+			{"grant_type", "refresh_token"},
+			{"refresh_token", (*current_epic_account)->refresh_token}
+		},
+		cpr::Header{
+			{"Authorization", epic_create_basic_authorization(FORTNITE_IOS_GAME_CLIENT_ID, FORTNITE_IOS_GAME_CLIENT_SECRET)}
+		}
+	);
+
+	if (response.status_code != 200) return false;
+
+	nlohmann::json body = nlohmann::json::parse(response.text);
+
+	return parse_epic_account(body, *current_epic_account);
+}
+
 bool epic_login_with_device_auth(epic_device_auth_t device_auth, epic_account_t* out)
 {
 	if (device_auth.account_id.empty() || device_auth.device_id.empty() || device_auth.secret.empty()) return false;

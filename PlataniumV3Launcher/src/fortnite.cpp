@@ -69,21 +69,25 @@ bool start_fortnite_and_inject_dll(void)
 	std::string exchangeCode;
 	if (!epic_create_exchange_code(exchangeCode))
 	{
-		delete* current_epic_account;
-		*current_epic_account = nullptr;
-		if (!g_configuration->deviceAuth.account_id.empty() && !g_configuration->deviceAuth.device_id.empty() && !g_configuration->deviceAuth.secret.empty())
+		bool tokenRefreshed = epic_login_with_refresh_token();
+		if (tokenRefreshed)
 		{
-			epic_account_t* user = new epic_account_t();
-			if (!epic_login_with_device_auth(g_configuration->deviceAuth, user))
+			if (epic_create_exchange_code(exchangeCode))
 			{
-				spdlog::error("Failed to re-auth");
-				ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to re-auth using deviceauth." });
+				spdlog::warn("Invalid token, but refreshed it so its ok");
+				ImGui::InsertNotification({ ImGuiToastType_Warning, 3000, "Your token was invalid" });
+			}
+			else {
+				spdlog::error("Refreshed token correctly, but failed to create exchange code still !");
+				ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to refresh token !" });
+				return false;
 			}
 		}
-
-		spdlog::error("Failed to create exchange code");
-		ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to create exchange code" });
-		return false;
+		else {
+			spdlog::warn("Failed to refresh token !");
+			ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to refresh token !" });
+			return false;
+		}
 	}
 
 	fs::path configPath = fs::current_path() / "config.json";
@@ -143,7 +147,7 @@ bool start_fortnite_and_inject_dll(void)
 
 	HANDLE hLoadThread = CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)LoadLibraryAddress, buffer, 0, 0);
 
-	if (hLoadThread == INVALID_HANDLE_VALUE)
+	if (hLoadThread == INVALID_HANDLE_VALUE || hLoadThread == 0)
 	{
 		spdlog::error("CreateRemoteThread failed with error code: {}", GetLastError());
 		ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to inject DLL" });

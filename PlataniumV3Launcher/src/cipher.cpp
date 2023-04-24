@@ -26,7 +26,7 @@ bool cipher_secret(epic_device_auth_t* device_auth, std::string& secret)
 
 	device_auth->secret = result;
 
-	spdlog::info("Successfully ciphered the secret deviceAuth. sizeof(device_auth->secret): {}", device_auth->secret.size());
+	spdlog::debug("Successfully ciphered the secret deviceAuth. sizeof(device_auth->secret): {}", device_auth->secret.size());
 
 	return true;
 }
