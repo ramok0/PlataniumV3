@@ -22,6 +22,13 @@ void render_main_form(void)
 {
 	static char buf1[MAX_PATH];
 	static char buf2[MAX_PATH];
+	static std::once_flag init_flag;
+	std::call_once(init_flag, []() {
+		strcpy_s(buf1, sizeof(buf1), g_configuration->forwardHost.c_str());
+		strcpy_s(buf2, sizeof(buf1), g_configuration->forwardProxy.c_str());
+		});
+
+
 	const float inputFloat = 370.f;
 
 
@@ -77,7 +84,7 @@ void render_main_form(void)
 	
 	ImGui::SetCursorPosX(originalPosX + off);
 
-	ImGui::Checkbox("Dump AES (experimental)", &g_configuration->useProxy);
+	ImGui::Checkbox("Dump AES keys (experimental)", &g_configuration->dump_aes);
 	if (ImGui::IsItemHovered())
 	{
 		ImGui::SetTooltip("This is not implemented yet.");
@@ -106,6 +113,9 @@ void render_main_form(void)
 	ImGui::SameLine();
 	if (ImGui::Button("Save settings", boutonSize))
 	{
+		g_configuration->forwardHost = std::string(buf1);
+		g_configuration->forwardProxy = std::string(buf2);
+
 		write_configuration();
 		ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Applied configuration successfully" });
 	}
@@ -204,7 +214,8 @@ void gui_render(void)
 			spdlog::warn("Invalid Fortnite folder selected.");
 		}
 		else {
-			g_configuration->fortnite_path = fileDialog.GetSelected().string();
+			g_configuration->fortnite_build.path = fileDialog.GetSelected().string();
+			find_fortnite_engine_version();
 			write_configuration();
 			ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Updated Fortnite directory successfully" });
 		}

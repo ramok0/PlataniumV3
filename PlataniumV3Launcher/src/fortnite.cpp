@@ -1,6 +1,8 @@
 #include "../include/plataniumv3launcher.hpp"
 #include <processthreadsapi.h>
 
+#pragma comment(lib, "version.lib")
+
 bool fortnite_find_default_installation_path(fs::path& fortnite_out_path)
 {
 	fs::path launcherInstalled = fs::path(EPIC_LAUNCHER_INSTALLED_PATH);
@@ -15,7 +17,7 @@ bool fortnite_find_default_installation_path(fs::path& fortnite_out_path)
 	}
 
 	nlohmann::json data = nlohmann::json::parse(stream);
-	
+
 	if (data.find("InstallationList") == data.end())
 	{
 		stream.close();
@@ -35,7 +37,7 @@ bool fortnite_find_default_installation_path(fs::path& fortnite_out_path)
 		fortnite_out_path = fs::path(installLocation);
 		return true;
 	}
-	
+
 
 	stream.close();
 	return false;
@@ -48,14 +50,14 @@ std::string generate_fortnite_start_arguments(fs::path fortnitePath, fs::path co
 
 bool start_fortnite_and_inject_dll(void)
 {
-	if (!verify_fortnite_directory(g_configuration->fortnite_path))
+	if (!verify_fortnite_directory(g_configuration->fortnite_build.path))
 	{
 		ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Your Fortnite path is invalid !" });
 		spdlog::error("Invalid Fortnite Path, cannot start Fortnite.");
 		return false;
 	}
 
-	fs::path fortniteBinary = fs::path(g_configuration->fortnite_path) / "FortniteGame" / "Binaries" / "Win64" / "FortniteClient-Win64-Shipping.exe";
+	fs::path fortniteBinary = fs::path(g_configuration->fortnite_build.path) / "FortniteGame" / "Binaries" / "Win64" / "FortniteClient-Win64-Shipping.exe";
 
 	fs::path dllPath = fs::current_path() / "PlataniumV3.dll";
 
@@ -101,8 +103,8 @@ bool start_fortnite_and_inject_dll(void)
 
 	LPVOID LoadLibraryAddress = GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA");
 
-	STARTUPINFOA startupInfo{0};
-	PROCESS_INFORMATION processInfo{0};
+	STARTUPINFOA startupInfo{ 0 };
+	PROCESS_INFORMATION processInfo{ 0 };
 	std::string arguments = generate_fortnite_start_arguments(fortniteBinary, configPath, exchangeCode);
 	if (!CreateProcessA(nullptr, (LPSTR)arguments.c_str(), nullptr, nullptr, false, 0, nullptr, fortniteBinary.parent_path().string().c_str(), &startupInfo, &processInfo))
 	{
@@ -165,9 +167,48 @@ bool start_fortnite_and_inject_dll(void)
 
 bool verify_fortnite_directory(fs::path directory)
 {
-	if (!fs::exists(directory / "FortniteGame") && fs::exists(directory / "Engine")) {
+	return fs::exists(directory / "FortniteGame") && fs::exists(directory / "Engine") && fs::exists(directory / "FortniteGame" / "Binaries" / "Win64" / "FortniteClient-Win64-Shipping.exe");
+}
+
+bool find_fortnite_engine_version(void)
+{
+	DWORD dwHandle = 0;
+
+	if (!verify_fortnite_directory(g_configuration->fortnite_build.path)) return false;
+
+	fs::path fortnite_path = fs::path(g_configuration->fortnite_build.path) / "FortniteGame" / "Binaries" / "Win64" / "FortniteClient-Win64-Shipping.exe";
+
+	spdlog::trace("{} - Path: {}", __FUNCTION__, fortnite_path.string().c_str());
+
+	DWORD dwSize = GetFileVersionInfoSizeA(fortnite_path.string().c_str(), &dwHandle);
+	if (dwSize == NULL)
+	{
+		spdlog::error("{} - Error: GetFileVersionInfoSizeA failed with error code : {}", __FUNCTION__, GetLastError());
 		return false;
 	}
 
-	return fs::exists(directory / "FortniteGame" / "Binaries" / "Win64" / "FortniteClient-Win64-Shipping.exe");
+	std::vector<BYTE> buffer(dwSize);
+	if (!GetFileVersionInfoA(fortnite_path.string().c_str(), NULL, dwSize, buffer.data()))
+	{
+		spdlog::error("{} - Error: GetFileVersionInfoA failed with error code : {}", __FUNCTION__, GetLastError());
+		return false;
+	}
+
+	VS_FIXEDFILEINFO* pFileInfo;
+	UINT uLen;
+	if (!VerQueryValueA(buffer.data(), "\\", (LPVOID*)&pFileInfo, &uLen))
+	{
+		spdlog::error("{} - Error: VerQueryValueA failed with error code : {}", __FUNCTION__, GetLastError());
+		return false;
+	}
+
+	spdlog::trace("Fortnite file version: {}.{}.{}.{}", HIWORD(pFileInfo->dwFileVersionMS), LOWORD(pFileInfo->dwFileVersionMS), HIWORD(pFileInfo->dwFileVersionLS), LOWORD(pFileInfo->dwFileVersionLS));
+
+	float engineVersion = HIWORD(pFileInfo->dwFileVersionMS) + LOWORD(pFileInfo->dwFileVersionMS) / 10.f;
+
+	g_configuration->fortnite_build.engine_version = engineVersion;
+
+	spdlog::debug("{} - found engine version : {}", __FUNCTION__, g_configuration->fortnite_build.engine_version);
+
+	return true;
 }

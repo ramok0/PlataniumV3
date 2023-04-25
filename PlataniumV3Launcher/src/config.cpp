@@ -16,11 +16,13 @@ void create_default_config(void)
 	g_configuration->forwardHost = "";
 	g_configuration->forwardPort = 0;
 	g_configuration->forwardProxy = "";
+	g_configuration->dump_aes = false;
 	
 	fs::path outFortntePath;
 	if (fortnite_find_default_installation_path(outFortntePath))
 	{
-		g_configuration->fortnite_path = outFortntePath.string();
+		g_configuration->fortnite_build.path = outFortntePath.string();
+		find_fortnite_engine_version();
 	}
 
 	write_configuration();
@@ -68,8 +70,9 @@ void write_configuration(void)
 		{"forwardProxy", g_configuration->forwardProxy},
 		{"forwardHost", g_configuration->forwardHost},
 		{"forwardPort", g_configuration->forwardPort},
-		{"fortnite_path", g_configuration->fortnite_path},
-		{"should_check_pak", g_configuration->should_check_pak}
+		{"fortnite_path", g_configuration->fortnite_build.path},
+		{"should_check_pak", g_configuration->should_check_pak},
+		{"dump_aes", g_configuration->dump_aes}
 	};
 
 	if (!g_configuration->deviceAuth.account_id.empty() && !g_configuration->deviceAuth.device_id.empty() && !g_configuration->deviceAuth.secret.empty())

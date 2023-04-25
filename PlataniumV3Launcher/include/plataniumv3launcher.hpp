@@ -26,11 +26,12 @@ const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 constexpr const char* WINDOW_TITLE = "PlataniumV3 Launcher";
 constexpr ImGuiWindowFlags WINDOW_FLAGS = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse;
+
 constexpr const char* FORTNITE_IOS_GAME_CLIENT_ID = "3446cd72694c4a4485d81b77adbb2141";
 constexpr const char* FORTNITE_IOS_GAME_CLIENT_SECRET = "9209d4a5e25a457fb9b07489d313b41a";
-constexpr const char* EPIC_LAUNCHER_INSTALLED_PATH = "C:\\ProgramData\\Epic\\UnrealEngineLauncher\\LauncherInstalled.dat";
 constexpr const char* FORTNITE_ITEM_ID = "4fe75bbc5a674f4f9b356b5c90567da5";
 
+constexpr const char* EPIC_LAUNCHER_INSTALLED_PATH = "C:\\ProgramData\\Epic\\UnrealEngineLauncher\\LauncherInstalled.dat";
 
 constexpr const char* EPIC_GENERATE_AUTHORIZATION_CODE_URL = "https://www.epicgames.com/id/api/redirect?clientId={}&responseType=code";
 constexpr const char* EPIC_GENERATE_TOKEN_URL = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token";
@@ -47,27 +48,32 @@ struct epic_account_t {
 	std::string display_name;
 };
 
-inline epic_account_t** current_epic_account = new epic_account_t*();
-
 struct epic_device_auth_t {
 	std::string device_id;
 	std::string account_id;
 	std::vector<std::uint8_t> secret;
 };
 
+struct fortnite_build_t {
+	std::string path;
+	float engine_version;
+};
+
 struct configuration_t {
 	bool disableSSL = false;
 	bool detourURL = false;
 	bool useProxy = false;
+	bool dump_aes = false;
 	bool should_check_pak = false;
 	std::string forwardProxy;
 	std::string forwardHost;
 	int forwardPort;
-	std::string fortnite_path;
+	fortnite_build_t fortnite_build;
 	epic_device_auth_t deviceAuth;
 };
 
 inline configuration_t* g_configuration = new configuration_t();
+inline epic_account_t** current_epic_account = new epic_account_t * ();
 
 /*
 window related functions
@@ -136,6 +142,8 @@ bool start_fortnite_and_inject_dll(void);
 std::string generate_fortnite_start_arguments(fs::path fortnitePath, fs::path configPath, std::string exchangeCode);
 //verify fortnite directory
 bool verify_fortnite_directory(fs::path directory);
+//find fortnite path staticly
+bool find_fortnite_engine_version(void);
 
 /*
 configuration related functions

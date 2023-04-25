@@ -58,11 +58,14 @@ bool parse_configuration(nlohmann::json& document, configuration_t* out)
 	json_get(document, "disableSSL", bool, out->disableSSL)
 		json_get(document, "detourURL", bool, out->detourURL)
 		json_get(document, "useProxy", bool, out->useProxy)
+		json_get(document, "dump_aes", bool, out->dump_aes)
 		json_get(document, "should_check_pak", bool, out->should_check_pak)
 		json_get(document, "forwardHost", std::string, out->forwardHost)
 		json_get(document, "forwardProxy", std::string, out->forwardProxy)
 		json_get(document, "forwardPort", int, out->forwardPort)
-		json_get(document, "fortnite_path", std::string, out->fortnite_path)
+		json_get(document, "fortnite_path", std::string, out->fortnite_build.path)
+		if(!out->fortnite_build.path.empty())
+			find_fortnite_engine_version();
 
 		if (document.find("device_auth") != document.end())
 		{
