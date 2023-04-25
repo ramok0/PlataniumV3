@@ -18,6 +18,7 @@ int main(void)
 	}
 
 	GLFWwindow* window;
+
 	if (!create_window(&window))
 	{
 		spdlog::info("{} - Closing app.", __FUNCTION__);
