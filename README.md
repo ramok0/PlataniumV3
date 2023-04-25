@@ -26,3 +26,9 @@ You can watch a video of me trying the program [here](https://streamable.com/j6q
 #### Can i get banned using this ?
 
 You can't as there is no anti-cheat running alongside fortnite 
+
+#### My antivirus is detecting PlataniumV3 as a virus, is it safe ?
+
+- PlataniumV3 is safe and the launcher too, it might be flagged as a virus because it inject DLL into Fortnite.
+
+- If you don't trust me, you can review the source code and build it yourself.
