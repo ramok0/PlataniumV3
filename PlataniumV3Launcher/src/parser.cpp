@@ -1,10 +1,5 @@
 #include "../include/plataniumv3launcher.hpp"
 
-static bool jsonExists(nlohmann::json& document, const std::string key)
-{
-	return document.find(key) != document.end();
-}
-
 #define json_get(document, key, type, out) \
 	if(document.find(key) != document.end())\
 	{\
@@ -32,7 +27,7 @@ bool parse_epic_account(nlohmann::json& document, epic_account_t* out)
 	out->expires_at = currentTimestamp + expires_in;
 	out->refresh_expires_at = currentTimestamp + refresh_expires_in;
 
-	spdlog::debug("expires_at => {}, current => {}", out->expires_at, currentTimestamp);
+	spdlog::debug("{} - expires_at => {}, current => {}", __FUNCTION__, out->expires_at, currentTimestamp);
 
 	return true;
 }
@@ -46,7 +41,7 @@ bool parse_deviceauth(nlohmann::json& document, epic_device_auth_t* out, std::st
 		json_get(document, "secret", std::string, secret);
 	}
 	else {
-		spdlog::error("Type of deviceauth's secret is not std::string, cannot parse it");
+		spdlog::error("{} - Type of deviceauth's secret is not std::string, cannot parse it", __FUNCTION__);
 		return false;
 	}
 

@@ -33,7 +33,7 @@ bool fortnite_find_default_installation_path(fs::path& fortnite_out_path)
 		if (installation.find("InstallLocation") == installation.end()) break;
 
 		std::string installLocation = installation["InstallLocation"].get<std::string>();
-		spdlog::info("Found Fortnite install location => {}", installLocation);
+		spdlog::info("{} - Found Fortnite install location => {}", __FUNCTION__, installLocation);
 		fortnite_out_path = fs::path(installLocation);
 		return true;
 	}
@@ -53,7 +53,7 @@ bool start_fortnite_and_inject_dll(void)
 	if (!verify_fortnite_directory(g_configuration->fortnite_build.path))
 	{
 		ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Your Fortnite path is invalid !" });
-		spdlog::error("Invalid Fortnite Path, cannot start Fortnite.");
+		spdlog::error("{} - Invalid Fortnite Path, cannot start Fortnite.", __FUNCTION__);
 		return false;
 	}
 
@@ -76,17 +76,17 @@ bool start_fortnite_and_inject_dll(void)
 		{
 			if (epic_create_exchange_code(exchangeCode))
 			{
-				spdlog::warn("Invalid token, but refreshed it so its ok");
+				spdlog::warn("{} - Invalid token, but refreshed it so its ok", __FUNCTION__);
 				ImGui::InsertNotification({ ImGuiToastType_Warning, 3000, "Your token was invalid" });
 			}
 			else {
-				spdlog::error("Refreshed token correctly, but failed to create exchange code still !");
+				spdlog::error("{} - Refreshed token correctly, but failed to create exchange code still !", __FUNCTION__);
 				ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to refresh token !" });
 				return false;
 			}
 		}
 		else {
-			spdlog::warn("Failed to refresh token !");
+			spdlog::warn("{} - Failed to refresh token !", __FUNCTION__);
 			ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to refresh token !" });
 			return false;
 		}
@@ -96,7 +96,7 @@ bool start_fortnite_and_inject_dll(void)
 
 	if (!fs::exists(configPath))
 	{
-		spdlog::error("Failed to find configuration file");
+		spdlog::error("{} - Failed to find configuration file", __FUNCTION__);
 		ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to find configuration" });
 		return false;
 	}
@@ -108,7 +108,7 @@ bool start_fortnite_and_inject_dll(void)
 	std::string arguments = generate_fortnite_start_arguments(fortniteBinary, configPath, exchangeCode);
 	if (!CreateProcessA(nullptr, (LPSTR)arguments.c_str(), nullptr, nullptr, false, 0, nullptr, fortniteBinary.parent_path().string().c_str(), &startupInfo, &processInfo))
 	{
-		spdlog::error("Failed to create fortnite process, error : {}", GetLastError());
+		spdlog::error("{} - Failed to create fortnite process, error : {}", __FUNCTION__,GetLastError());
 		ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to start fortnte" });
 		return false;
 	}
@@ -122,7 +122,7 @@ bool start_fortnite_and_inject_dll(void)
 
 	if (hProcess == INVALID_HANDLE_VALUE)
 	{
-		spdlog::error("Failed to open handle");
+		spdlog::error("{} - Failed to open handle", __FUNCTION__);
 		ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to inject DLL" });
 		return false;
 	}
@@ -130,7 +130,7 @@ bool start_fortnite_and_inject_dll(void)
 	LPVOID buffer = VirtualAllocEx(hProcess, nullptr, dllPath.string().size(), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 	if (!buffer)
 	{
-		spdlog::error("VirtualAllocEx failed with error code: {}", GetLastError());
+		spdlog::error("{} - VirtualAllocEx failed with error code: {}", __FUNCTION__, GetLastError());
 		ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to inject DLL" });
 		CloseHandle(hProcess);
 		return false;
@@ -141,7 +141,7 @@ bool start_fortnite_and_inject_dll(void)
 	SIZE_T NumberOfBytesWritten;
 	if (!WriteProcessMemory(hProcess, buffer, path.c_str(), path.size(), &NumberOfBytesWritten))
 	{
-		spdlog::error("WriteProcessMemory failed with error code: {}", GetLastError());
+		spdlog::error("{} - WriteProcessMemory failed with error code: {}", __FUNCTION__, GetLastError());
 		ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to inject DLL" });
 		CloseHandle(hProcess);
 		return false;
@@ -151,7 +151,7 @@ bool start_fortnite_and_inject_dll(void)
 
 	if (hLoadThread == INVALID_HANDLE_VALUE || hLoadThread == 0)
 	{
-		spdlog::error("CreateRemoteThread failed with error code: {}", GetLastError());
+		spdlog::error("{} - CreateRemoteThread failed with error code: {}", __FUNCTION__, GetLastError());
 		ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to inject DLL" });
 		CloseHandle(hProcess);
 		return false;
@@ -159,7 +159,7 @@ bool start_fortnite_and_inject_dll(void)
 
 	CloseHandle(hLoadThread);
 
-	spdlog::info("Started Fortnite and injected DLL successfully, fortnite PID: {}", processInfo.dwProcessId);
+	spdlog::info("{} - Started Fortnite and injected DLL successfully, fortnite PID: {}", __FUNCTION__, processInfo.dwProcessId);
 	ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Started Fortnite and Injected DLL successfully !" });
 
 	return true;
@@ -204,9 +204,12 @@ bool find_fortnite_engine_version(void)
 
 	spdlog::trace("Fortnite file version: {}.{}.{}.{}", HIWORD(pFileInfo->dwFileVersionMS), LOWORD(pFileInfo->dwFileVersionMS), HIWORD(pFileInfo->dwFileVersionLS), LOWORD(pFileInfo->dwFileVersionLS));
 
-	float engineVersion = HIWORD(pFileInfo->dwFileVersionMS) + LOWORD(pFileInfo->dwFileVersionMS) / 10.f;
+	DWORD firstPart = HIWORD(pFileInfo->dwFileVersionMS);
+	DWORD secondPart = LOWORD(pFileInfo->dwFileVersionMS);
 
-	g_configuration->fortnite_build.engine_version = engineVersion;
+	std::string strVersion = std::format("{}.{}", firstPart, secondPart); //ceci est égal à "4.20"
+
+	g_configuration->fortnite_build.engine_version = std::stof(strVersion); //ceci est égal a 4.2
 
 	spdlog::debug("{} - found engine version : {}", __FUNCTION__, g_configuration->fortnite_build.engine_version);
 

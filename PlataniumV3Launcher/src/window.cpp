@@ -14,13 +14,13 @@ bool create_window(GLFWwindow** lpWindow)
 {
 	if (!lpWindow)
 	{
-		spdlog::critical("lpWindow is nullptr, aborting."); 
+		spdlog::critical("{} - lpWindow is nullptr, aborting.", __FUNCTION__);
 		return false;
 	}
 
 	if (!glfwInit())
 	{
-		spdlog::critical("glfwInit returned false, aborting.");
+		spdlog::critical("{} - glfwInit returned false, aborting.", __FUNCTION__);
 		return false;
 	}
 
@@ -29,13 +29,13 @@ bool create_window(GLFWwindow** lpWindow)
 	GLFWwindow* window = *lpWindow = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
 	if (window == nullptr)
 	{
-		spdlog::critical("failed to create window, glfwCreateWindow returned nullptr.");
+		spdlog::critical("{} - failed to create window, glfwCreateWindow returned nullptr.", __FUNCTION__);
 		return false;
 	}
 
 	glfwMakeContextCurrent(window);
 
-	spdlog::info("created window handle");
+	spdlog::info("{} - created window handle", __FUNCTION__);
 
 	glfwSwapInterval(1);
 
@@ -50,7 +50,7 @@ void initialize_imgui(GLFWwindow* window)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 130");
 
-	spdlog::info("Initialized ImGui successfully");
+	spdlog::info("{} - Initialized ImGui successfully", __FUNCTION__);
 
 	initialize_styles();
 }
@@ -69,7 +69,7 @@ void initialize_styles(void)
 		
 	ImVec4* colors = ImGui::GetStyle().Colors;
 	colors[ImGuiCol_WindowBg] = { 0.094f, 0.094f,0.094f,1.f };
-	spdlog::info("Initialized styles successfully");
+	spdlog::info("{} - Initialized styles successfully", __FUNCTION__);
 }
 
 void window_loop(GLFWwindow* window)
@@ -107,4 +107,6 @@ void cleanup_window(GLFWwindow* window)
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
+
+	spdlog::info("{} - unloaded library successfully", __FUNCTION__);
 }

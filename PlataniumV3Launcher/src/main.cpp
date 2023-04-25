@@ -12,7 +12,7 @@ int main(void)
 		{
 			memset(&g_configuration->deviceAuth, 0, sizeof(epic_device_auth_t));
 			write_configuration();
-			spdlog::info("successfully destroyed current device auth because it was invalid");
+			spdlog::info("{} - successfully destroyed current device auth because it was invalid", __FUNCTION__);
 			delete user;
 		}
 	}
@@ -20,7 +20,7 @@ int main(void)
 	GLFWwindow* window;
 	if (!create_window(&window))
 	{
-		spdlog::info("Closing app.");
+		spdlog::info("{} - Closing app.", __FUNCTION__);
 		return 1;
 	}
 

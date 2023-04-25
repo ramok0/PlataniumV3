@@ -17,7 +17,7 @@ bool epic_login_with_authorization_code(std::string& authorizationCode, epic_acc
 
 	*current_epic_account = out;
 
-	spdlog::info("Successfully connected to epicgames with authorization_code");
+	spdlog::info("{} - Successfully connected to epicgames with authorization_code", __FUNCTION__);
 
 	return true;
 }
@@ -41,7 +41,10 @@ bool epic_login_with_refresh_token(void)
 		}
 	);
 
-	if (response.status_code != 200) return false;
+	if (response.status_code != 200) {
+		spdlog::debug("{} - Response => {}", __FUNCTION__, response.text);
+		return false;
+	}
 
 	nlohmann::json body = nlohmann::json::parse(response.text);
 
@@ -66,7 +69,10 @@ bool epic_login_with_device_auth(epic_device_auth_t device_auth, epic_account_t*
 		cpr::Payload{ {"grant_type", "device_auth"}, {"account_id", device_auth.account_id}, {"device_id", device_auth.device_id}, {"secret", secretPlainText }
 	});
 
-	if (response.status_code != 200) return false;
+	if (response.status_code != 200) {
+		spdlog::debug("{} - Response => {}", __FUNCTION__, response.text);
+		return false;
+	}
 	
 	nlohmann::json body = nlohmann::json::parse(response.text);
 
@@ -74,7 +80,7 @@ bool epic_login_with_device_auth(epic_device_auth_t device_auth, epic_account_t*
 
 	*current_epic_account = out;
 
-	spdlog::info("Successfully connected to epicgames with deviceauth");
+	spdlog::info("{} - Successfully connected to epicgames with deviceauth", __FUNCTION__);
 
 	return true;
 }
@@ -88,9 +94,11 @@ bool epic_create_device_auth(epic_device_auth_t* out)
 		cpr::Header{ {"Authorization", epic_generate_bearer_authorization()}, {"Content-Type", "application/json"}}
 	);
 
-	spdlog::debug("Response => {}", response.text);
 
-	if (response.status_code != 200) return false;
+	if (response.status_code != 200) {
+		spdlog::debug("{} - Response => {}", __FUNCTION__, response.text);
+		return false;
+	}
 
 	nlohmann::json json = nlohmann::json::parse(response.text);
 
@@ -119,9 +127,10 @@ bool epic_create_exchange_code(std::string& out)
 		cpr::Header{ {"Authorization", epic_generate_bearer_authorization()} }
 	);
 
-	spdlog::debug("Response => {}", response.text);
-
-	if (response.status_code != 200) return false;
+	if (response.status_code != 200) {
+		spdlog::debug("{} - Response => {}", __FUNCTION__, response.text);
+		return false;
+	}
 
 	nlohmann::json body = nlohmann::json::parse(response.text);
 

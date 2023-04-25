@@ -7,7 +7,7 @@ bool config_exists(void)
 
 void create_default_config(void)
 {
-	spdlog::info("creating default configuration file");
+	spdlog::info("{} - creating default configuration file", __FUNCTION__);
 
 	g_configuration->detourURL = false;
 	g_configuration->disableSSL = false;
@@ -42,7 +42,7 @@ void read_config(void)
 	std::ifstream stream(config_path);
 
 	if (!stream.is_open()) {
-		spdlog::critical("Failed to read configuration file !");
+		spdlog::critical("{} - Failed to read configuration file !", __FUNCTION__);
 		throw std::runtime_error("Failed to read configuration !");
 	}
 
@@ -52,7 +52,7 @@ void read_config(void)
 
 	if (!parse_configuration(configJson, g_configuration))
 	{
-		spdlog::critical("Failed to read configuration file !");
+		spdlog::critical("{} - Failed to read configuration file !", __FUNCTION__);
 		throw std::runtime_error("Failed to read configuration !");
 	}
 
@@ -88,7 +88,7 @@ void write_configuration(void)
 
 	config_stream << std::setw(4) << json << std::endl;
 	
-	spdlog::info("Written config successfully (path:{})", configuration_path.string());
+	spdlog::info("{} - Written config successfully (path:{})", __FUNCTION__, configuration_path.string());
 
 	json.clear();
 	config_stream.close();

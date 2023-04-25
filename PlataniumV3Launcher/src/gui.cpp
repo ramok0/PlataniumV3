@@ -125,7 +125,7 @@ void render_main_form(void)
 
 	ImVec2 viewportSize = ImGui::GetMainViewport()->WorkSize;
 
-	std::string finalText = std::format("Found UE Version: {}\nPlataniumV3 - Made by @Ramokprout on github", g_configuration->fortnite_build.engine_version);
+	std::string finalText = std::format("Found UE Version: {:.2f}\nPlataniumV3 - Made by @Ramokprout on github", g_configuration->fortnite_build.engine_version);
 	ImVec2 finalTextSize = ImGui::CalcTextSize(finalText.c_str());
 
 	ImGui::SetCursorPos({ 10.f, viewportSize.y - finalTextSize.y - 10.f});
@@ -222,7 +222,7 @@ void gui_render(void)
 		if (!verify_fortnite_directory(fileDialog.GetSelected()))
 		{
 			ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Invalid Fortnite folder selected. Please make sure that your Fortnite directory contains a 'Engine' and a 'FortniteGame' directory inside it." });
-			spdlog::warn("Invalid Fortnite folder selected.");
+			spdlog::warn("{} - Invalid Fortnite folder selected.", __FUNCTION__);
 		}
 		else {
 			g_configuration->fortnite_build.path = fileDialog.GetSelected().string();
