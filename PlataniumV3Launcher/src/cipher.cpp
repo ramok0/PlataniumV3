@@ -24,7 +24,11 @@ bool cipher_secret(epic_device_auth_t* device_auth, std::string& secret)
 		result.push_back(out.pbData[i]);
 	}
 
-	device_auth->secret = result;
+	std::string toEncode = std::string((char*)result.data(), result.size());
+
+	
+
+	device_auth->secret = base64_encode(toEncode);
 
 	spdlog::debug("Successfully ciphered the secret deviceAuth. sizeof(device_auth->secret): {}", device_auth->secret.size());
 
@@ -33,9 +37,15 @@ bool cipher_secret(epic_device_auth_t* device_auth, std::string& secret)
 
 bool uncipher_secret(std::string& secret)
 {
+	//passer le base64 en char*
+
+	std::string decoded_string = base64_decode(g_configuration->deviceAuth.secret);
+
+
+
 	DATA_BLOB in;
-	in.cbData = (DWORD)g_configuration->deviceAuth.secret.size();
-	in.pbData = (BYTE*)g_configuration->deviceAuth.secret.data();
+	in.cbData = (DWORD)decoded_string.size();
+	in.pbData = (BYTE*)decoded_string.data();
 
 	DATA_BLOB out{0};
 

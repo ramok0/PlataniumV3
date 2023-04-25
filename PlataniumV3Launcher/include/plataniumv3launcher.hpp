@@ -51,7 +51,7 @@ struct epic_account_t {
 struct epic_device_auth_t {
 	std::string device_id;
 	std::string account_id;
-	std::vector<std::uint8_t> secret;
+	std::string secret;
 };
 
 struct fortnite_build_t {

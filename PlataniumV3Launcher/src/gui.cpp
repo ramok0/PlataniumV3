@@ -31,8 +31,10 @@ void render_main_form(void)
 
 	const float inputFloat = 370.f;
 
+	//credits : https://github.com/FortniteModding/PlataniumV2
+	//credits : https://github.com/WorkingRobot/Platanium
 
-	const std::string text = std::format("Hi {}, welcome to PlataniumV3 !\nThis launcher has been made from scratch by github.com/Ramokprout\nInspired by PlataniumV3 by kem0x and Platanium by WorkingRobot", (*current_epic_account)->display_name);
+	const std::string text = std::format("Hi {}, welcome to PlataniumV3 !\nThis launcher is based on Platanium by WorkingRobot (original idea)", (*current_epic_account)->display_name);
 
 	ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
 
@@ -67,29 +69,29 @@ void render_main_form(void)
 
 	ImGuiStyle& style = ImGui::GetStyle();
 	float avail = ImGui::GetContentRegionAvail().x;
-	float off = (avail - static_cast<float>(inputFloat)) * 0.5f;
+	float centeroffset = (avail - static_cast<float>(inputFloat)) * 0.5f;
 
 	float originalPosX = ImGui::GetCursorPosX();
 
 	ImVec2 boutonSize = { (static_cast<float>(inputFloat) - (style.ItemSpacing.x * 2)) / 3, 25.f};
 
-	ImGui::SetCursorPosX(originalPosX + off);
+	ImGui::SetCursorPosX(originalPosX + centeroffset);
 	ImGui::Checkbox("Detour URL", &g_configuration->detourURL);
 	ImGui::SameLine();
-	ImGui::SetCursorPosX(originalPosX + off + boutonSize.x + style.ItemSpacing.x);
+	ImGui::SetCursorPosX(originalPosX + centeroffset + boutonSize.x + style.ItemSpacing.x);
 	ImGui::Checkbox("Disable SSL", &g_configuration->disableSSL);
 	ImGui::SameLine();
-	ImGui::SetCursorPosX(originalPosX + off + (boutonSize.x + style.ItemSpacing.x) * 2);
+	ImGui::SetCursorPosX(originalPosX + centeroffset + (boutonSize.x + style.ItemSpacing.x) * 2);
 	ImGui::Checkbox("Use Proxy", &g_configuration->useProxy);	
 	
-	ImGui::SetCursorPosX(originalPosX + off);
+	ImGui::SetCursorPosX(originalPosX + centeroffset);
 
 	ImGui::Checkbox("Dump AES keys (experimental)", &g_configuration->dump_aes);
 	if (ImGui::IsItemHovered())
 	{
 		ImGui::SetTooltip("This is not implemented yet.");
 	}
-	ImGui::SetCursorPosX(originalPosX + off);
+	ImGui::SetCursorPosX(originalPosX + centeroffset);
 
 	ImGui::Checkbox("Disable Signature Checks (experimental)", &g_configuration->should_check_pak);
 	if (ImGui::IsItemHovered())
@@ -105,6 +107,7 @@ void render_main_form(void)
 	{
 		std::thread(start_fortnite_and_inject_dll).detach();
 	}
+
 	ImGui::SameLine();
 	if (ImGui::Button("Edit Fortnite Path", boutonSize))
 	{
@@ -119,13 +122,21 @@ void render_main_form(void)
 		write_configuration();
 		ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Applied configuration successfully" });
 	}
+
+	ImVec2 viewportSize = ImGui::GetMainViewport()->WorkSize;
+
+	std::string finalText = std::format("Found UE Version: {}\nPlataniumV3 - Made by @Ramokprout on github", g_configuration->fortnite_build.engine_version);
+	ImVec2 finalTextSize = ImGui::CalcTextSize(finalText.c_str());
+
+	ImGui::SetCursorPos({ 10.f, viewportSize.y - finalTextSize.y - 10.f});
+	ImGui::Text(finalText.c_str());
 }
 
 void render_epic_games_login_form(void)
 {
 	static bool rememberMe = true;
 	const float inputTextWidth = 300.f;
-	static const char* text = "Authorization Code";
+	static const char* authorization_code = "Authorization Code";
 	static char buf[33];
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -135,8 +146,8 @@ void render_epic_games_login_form(void)
 	ImGui::SetCursorPosY(height / 3);
 
 	//center the "authorization code" text horizontally
-	ImGui::Align(ImGui::CalcTextSize(text).x, false);
-	ImGui::Text(text);
+	ImGui::Align(ImGui::CalcTextSize(authorization_code).x, false);
+	ImGui::Text(authorization_code);
 
 	//center the text input horizontally
 	ImGui::Align(inputTextWidth);

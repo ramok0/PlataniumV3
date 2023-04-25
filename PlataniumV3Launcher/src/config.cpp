@@ -35,7 +35,11 @@ void read_config(void)
 		create_default_config();
 	}
 
-	std::ifstream stream(fs::current_path() / "config.json");
+	fs::path config_path = fs::current_path() / "config.json";
+
+	spdlog::trace("{} - reading config at => {}", __FUNCTION__, config_path.string());
+
+	std::ifstream stream(config_path);
 
 	if (!stream.is_open()) {
 		spdlog::critical("Failed to read configuration file !");

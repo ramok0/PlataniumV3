@@ -72,9 +72,9 @@ bool parse_configuration(nlohmann::json& document, configuration_t* out)
 			json_get(document["device_auth"], "account_id", std::string, out->deviceAuth.account_id);
 			json_get(document["device_auth"], "device_id", std::string, out->deviceAuth.device_id);
 
-			if (document["device_auth"]["secret"].is_array())
+			if (document["device_auth"]["secret"].is_string())
 			{
-				out->deviceAuth.secret = document["device_auth"]["secret"].get<std::vector<uint8_t>>();
+				out->deviceAuth.secret = document["device_auth"]["secret"].get<std::string>();
 			}
 		}
 
