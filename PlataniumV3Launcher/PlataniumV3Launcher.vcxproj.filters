@@ -21,6 +21,9 @@
     <ClInclude Include="include\plataniumv3launcher.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="include\plataniumv3gui.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -70,6 +73,9 @@
     </ClCompile>
     <ClCompile Include="lib\base64\base64.cpp">
       <Filter>Fichiers sources\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\errors.cpp">
+      <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\plataniumv3gui.hpp" />
     <ClInclude Include="include\plataniumv3launcher.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +162,7 @@
     <ClCompile Include="src\cipher.cpp" />
     <ClCompile Include="src\config.cpp" />
     <ClCompile Include="src\epic.cpp" />
+    <ClCompile Include="src\errors.cpp" />
     <ClCompile Include="src\fortnite.cpp" />
     <ClCompile Include="src\gui.cpp" />
     <ClCompile Include="src\main.cpp" />

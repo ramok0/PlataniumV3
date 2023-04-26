@@ -1,4 +1,4 @@
-#include "../include/plataniumv3launcher.hpp"
+#include "../include/plataniumv3gui.hpp"
 #include <karlafont.h>
 
 const std::string get_window_title(void)

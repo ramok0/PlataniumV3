@@ -5,10 +5,8 @@ bool config_exists(void)
 	return fs::exists(fs::current_path() / "config.json");
 }
 
-void create_default_config(void)
+PLATANIUM_FAILURE_REASON create_default_config(void)
 {
-	spdlog::info("{} - creating default configuration file", __FUNCTION__);
-
 	g_configuration->detourURL = false;
 	g_configuration->disableSSL = false;
 	g_configuration->useProxy = false;
@@ -17,22 +15,32 @@ void create_default_config(void)
 	g_configuration->forwardPort = 0;
 	g_configuration->forwardProxy = "";
 	g_configuration->dump_aes = false;
+	g_configuration->debug_websockets = false;
 	
 	fs::path outFortntePath;
-	if (fortnite_find_default_installation_path(outFortntePath))
+	if (PLATANIUM_OK(platalog_error(fortnite_find_default_installation_path(outFortntePath), "fortnite_find_default_installation_path")))
 	{
 		g_configuration->fortnite_build.path = outFortntePath.string();
-		find_fortnite_engine_version();
+		platalog_error(find_fortnite_engine_version(), "find_fortnite_engine_version");
 	}
 
-	write_configuration();
+
+	if (!PLATANIUM_OK(platalog_error(write_configuration(), "write_configuration")))
+	{
+		return PLATANIUM_FAILED_TO_WRITEFILE;
+	}
+
+	return PLATANIUM_NO_FAILURE;
 }
 
-void read_config(void)
+PLATANIUM_FAILURE_REASON read_config(void)
 {
 	if (!config_exists())
 	{
-		create_default_config();
+		if (!PLATANIUM_OK(platalog_error(create_default_config(), "create_default_config")))
+		{
+			return PLATANIUM_FAILED_TO_WRITEFILE;
+		}
 	}
 
 	fs::path config_path = fs::current_path() / "config.json";
@@ -42,30 +50,28 @@ void read_config(void)
 	std::ifstream stream(config_path);
 
 	if (!stream.is_open()) {
-		spdlog::critical("{} - Failed to read configuration file !", __FUNCTION__);
-		throw std::runtime_error("Failed to read configuration !");
+		return PLATANIUM_FAILED_TO_READFILE;
 	}
 
 	nlohmann::json configJson = nlohmann::json::parse(stream);
 
 	stream.close();
 
-	if (!parse_configuration(configJson, g_configuration))
+	if (!PLATANIUM_OK(platalog_error(parse_configuration(configJson, g_configuration), "parse_configuration")))
 	{
-		spdlog::critical("{} - Failed to read configuration file !", __FUNCTION__);
-		throw std::runtime_error("Failed to read configuration !");
+		return PLATANIUM_FAILED_TO_PARSE;
 	}
 
-	spdlog::info("read config file successfully");
+	return PLATANIUM_NO_FAILURE;
 }
 
-void write_configuration(void)
+PLATANIUM_FAILURE_REASON write_configuration(void)
 {
 	static fs::path configuration_path = fs::current_path() / "config.json";
 
 	std::ofstream config_stream(configuration_path);
 
-	if (!config_stream.is_open()) return;
+	if (!config_stream.is_open()) return PLATANIUM_FAILED_TO_READFILE;
 
 	nlohmann::json json = {
 		{"disableSSL", g_configuration->disableSSL},
@@ -76,7 +82,8 @@ void write_configuration(void)
 		{"forwardPort", g_configuration->forwardPort},
 		{"fortnite_path", g_configuration->fortnite_build.path},
 		{"should_check_pak", g_configuration->should_check_pak},
-		{"dump_aes", g_configuration->dump_aes}
+		{"dump_aes", g_configuration->dump_aes},
+		{"debug_websockets", g_configuration->debug_websockets}
 	};
 
 	if (!g_configuration->deviceAuth.account_id.empty() && !g_configuration->deviceAuth.device_id.empty() && !g_configuration->deviceAuth.secret.empty())
@@ -92,4 +99,6 @@ void write_configuration(void)
 
 	json.clear();
 	config_stream.close();
+
+	return PLATANIUM_NO_FAILURE;
 }

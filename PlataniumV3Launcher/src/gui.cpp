@@ -1,4 +1,4 @@
-#include "../include/plataniumv3launcher.hpp"
+#include "../include/plataniumv3gui.hpp"
 
 namespace ImGui {
 	void Align(float width, bool set_next_item_with = true, float alignment = 0.5f)
@@ -28,6 +28,10 @@ void render_main_form(void)
 		strcpy_s(buf2, sizeof(buf1), g_configuration->forwardProxy.c_str());
 		});
 
+	if (ImGui::Button("invalidate token"))
+	{
+		(*current_epic_account)->access_token[0] = '}';
+	}
 
 	const float inputFloat = 370.f;
 
@@ -92,20 +96,32 @@ void render_main_form(void)
 		ImGui::SetTooltip("This is not implemented yet.");
 	}
 	ImGui::SetCursorPosX(originalPosX + centeroffset);
-
 	ImGui::Checkbox("Disable Signature Checks (experimental)", &g_configuration->should_check_pak);
 	if (ImGui::IsItemHovered())
 	{
 		ImGui::SetTooltip("This will probably not work with ancient versions. It works on UE 5.1.1.");
 	}
 
-
+	ImGui::SetCursorPosX(originalPosX + centeroffset);
+	ImGui::Checkbox("Debug Websockets", &g_configuration->debug_websockets);
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::SetTooltip("This will probably destroy every websocket communication in your Fortnite Client.");
+	}
 
 	ImGui::Align(boutonSize.x * 3 + ImGui::GetStyle().ItemSpacing.x * 2, false);
 
 	if (ImGui::Button("Start Fortnite", boutonSize))
 	{
-		std::thread(start_fortnite_and_inject_dll).detach();
+		std::thread([]() {
+			if (PLATANIUM_LOG(start_fortnite_and_inject_dll(), "start_fortnite_and_inject_dll"))
+			{
+				ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Started fortnite successfully." });
+			}
+			else {
+				ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to start Fortnite." });
+			}
+			}).detach();
 	}
 
 	ImGui::SameLine();
@@ -119,8 +135,13 @@ void render_main_form(void)
 		g_configuration->forwardHost = std::string(buf1);
 		g_configuration->forwardProxy = std::string(buf2);
 
-		write_configuration();
-		ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Applied configuration successfully" });
+		if (PLATANIUM_OK(platalog_error(write_configuration(), "write_configuration")))
+		{
+			ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Applied configuration successfully" });
+		}
+		else {
+			ImGui::InsertNotification({ ImGuiToastType_Warning, 3000, "Failed to save configuration" });
+		}
 	}
 
 	ImVec2 viewportSize = ImGui::GetMainViewport()->WorkSize;
@@ -164,12 +185,12 @@ void render_epic_games_login_form(void)
 		std::string authorizationCode = std::string(buf);
 		epic_account_t* account_buffer = new epic_account_t();
 
-		if (epic_login_with_authorization_code(authorizationCode, account_buffer))
+		if (PLATANIUM_LOG(epic_login_with_authorization_code(authorizationCode, account_buffer), "epic_login_with_authorization_code"))
 		{
 			epic_device_auth_t deviceAuth;
 			if (rememberMe)
 			{
-				if (epic_create_device_auth(&deviceAuth))
+				if (PLATANIUM_LOG(epic_create_device_auth(&deviceAuth), "epic_create_device_auth"))
 				{
 					g_configuration->deviceAuth = deviceAuth;
 					write_configuration();
@@ -178,7 +199,7 @@ void render_epic_games_login_form(void)
 					ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to create device_auth, 'remember be' will not work !" });
 				}
 			}
-			ImGui::InsertNotification({ ImGuiToastType_Success, 3000, std::format("Connected as {}", account_buffer->display_name).c_str() });
+			ImGui::InsertNotification({ ImGuiToastType_Success, 3000, std::format("Welcome back, {}", account_buffer->display_name).c_str() });
 		}
 		else {
 			ZeroMemory(buf, sizeof(buf));
@@ -226,9 +247,18 @@ void gui_render(void)
 		}
 		else {
 			g_configuration->fortnite_build.path = fileDialog.GetSelected().string();
-			find_fortnite_engine_version();
-			write_configuration();
-			ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Updated Fortnite directory successfully" });
+			if (!PLATANIUM_LOG(find_fortnite_engine_version(), "find_fortnite_engine_version"))
+			{
+				ImGui::InsertNotification({ ImGuiToastType_Warning, 3000, "Failed to find Fortnite Engine Version. Entering in compatibility mode." });
+			}
+			
+			if (PLATANIUM_LOG(write_configuration(), "write_configuration"))
+			{
+				ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Updated Fortnite directory successfully" });
+			}
+			else {
+				ImGui::InsertNotification({ ImGuiToastType_Warning, 3000, "Failed to write configuration !" });
+			}
 		}
 		fileDialog.ClearSelected();
 	}

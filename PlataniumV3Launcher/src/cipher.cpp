@@ -1,9 +1,7 @@
 #include "../include/plataniumv3launcher.hpp"
 
-bool cipher_secret(epic_device_auth_t* device_auth, std::string& secret)
+PLATANIUM_FAILURE_REASON cipher_secret(epic_device_auth_t* device_auth, std::string& secret)
 {
-	if (secret.empty()) return false;
-
 	DATA_BLOB data;
 	data.pbData = (BYTE*)secret.c_str();
 	data.cbData = (DWORD)secret.size();
@@ -14,7 +12,7 @@ bool cipher_secret(epic_device_auth_t* device_auth, std::string& secret)
 	if (!CryptProtectData(&data, NULL, NULL, NULL, NULL, NULL, &out))
 	{
 		spdlog::error("Failed to crypt 'secret' value, error: {}", GetLastError());
-		return false;
+		return PLATANIUM_FAILED_TO_CRYPT;
 	}
 
 	std::vector<std::uint8_t> result;
@@ -28,13 +26,13 @@ bool cipher_secret(epic_device_auth_t* device_auth, std::string& secret)
 
 	device_auth->secret = base64_encode(toEncode);
 
-	spdlog::debug("Successfully ciphered the secret deviceAuth. sizeof(device_auth->secret): {}", device_auth->secret.size());
-
-	return true;
+	return PLATANIUM_NO_FAILURE;
 }
 
-bool uncipher_secret(std::string& secret)
+PLATANIUM_FAILURE_REASON uncipher_secret(std::string& secret)
 {
+	if (g_configuration->deviceAuth.secret.empty()) return PLATANIUM_FAILURE_REASON::PLATANIUM_MISSING_SECRET;
+
 	//passer le base64 en char*
 	std::string decoded_string = base64_decode(g_configuration->deviceAuth.secret);
 
@@ -45,11 +43,11 @@ bool uncipher_secret(std::string& secret)
 	DATA_BLOB out{0};
 
 	if (!CryptUnprotectData(&in, NULL, NULL, NULL, NULL, NULL, &out)) {
-		spdlog::error("failed to decrypt deviceauth's secret.");
-		return false;
+		spdlog::error("failed to decrypt deviceauth's secret. {}", GetLastError());
+		return PLATANIUM_FAILURE_REASON::PLATANIUM_FAILED_TO_CRYPT;
 	}
 
 	secret = std::string((char*)out.pbData, (size_t)out.cbData);
 
-	return true;
+	return PLATANIUM_FAILURE_REASON::PLATANIUM_NO_FAILURE;
 }

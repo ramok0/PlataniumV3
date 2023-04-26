@@ -1,4 +1,4 @@
-#include "../include/plataniumv3launcher.hpp"
+#include "../include/plataniumv3gui.hpp"
 
 int main(void)
 {
@@ -8,7 +8,7 @@ int main(void)
 	if (!g_configuration->deviceAuth.account_id.empty() && !g_configuration->deviceAuth.device_id.empty() && !g_configuration->deviceAuth.secret.empty())
 	{
 		epic_account_t* user = new epic_account_t();
-		if (!epic_login_with_device_auth(g_configuration->deviceAuth, user))
+		if (!PLATANIUM_OK(platalog_error(epic_login_with_device_auth(g_configuration->deviceAuth, user), "epic_login_with_device_auth")))
 		{
 			memset(&g_configuration->deviceAuth, 0, sizeof(epic_device_auth_t));
 			write_configuration();
