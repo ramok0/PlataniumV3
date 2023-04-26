@@ -17,6 +17,12 @@ void find_patterns(void)
 		addresses::validate_container_signature = Memcury::Scanner::FindPattern("40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 FF 45 33 ED").GetAs<void*>();
 	}
 
+	if (configuration::debug_websockets)
+	{
+		addresses::lws_client_connect_via_info = Memcury::Scanner::FindPattern("48 89 74 24 ? 57 48 83 EC 20 48 8B 71 30 48 8B F9").GetAs<void*>();
+		addresses::lws_create_context = Memcury::Scanner::FindPattern("40 57 48 83 EC 40 48 8B F9").GetAs<void*>();
+	}
+
 //	addresses::game_engine = Memcury::Scanner::FindStringRef(GENGINE_STRING)
 
 	log_pointer("curl_easy_setopt", addresses::curl_easy_setopt, true);
@@ -25,6 +31,11 @@ void find_patterns(void)
 	log_pointer("FGenericPlatformMisc::RequestExitWithStatus", addresses::request_exit_with_status, true);
 	log_pointer("UnsafeEnvironnement", addresses::unsafeenvironnement, true);
 	log_pointer("validate_container_signature", addresses::validate_container_signature, true);
+	if (configuration::debug_websockets)
+	{
+		log_pointer("lws_create_context", addresses::lws_create_context, true);
+		log_pointer("lws_client_connect_via_info", addresses::lws_client_connect_via_info, true);
+	}
 }
 
 void assign_natives(void)
@@ -35,4 +46,9 @@ void assign_natives(void)
 	assign(native::request_exit_with_status, addresses::request_exit_with_status);
 	assign(native::unsafe_environnement, addresses::unsafeenvironnement);
 	assign(native::ValidateContainerSignature, addresses::validate_container_signature);
+	if (configuration::debug_websockets)
+	{
+		assign(native::lws_create_context, addresses::lws_create_context);
+		assign(native::lws_client_connect_via_info, addresses::lws_client_connect_via_info);
+	}
 }

@@ -26,6 +26,7 @@ CURLcode __fastcall hk_curl_easy_setopt(void* curlhandle, CURLoption opt, ...)
 
 	CURLcode result{};
 
+
 	auto setProxy = [&result, &curlhandle]() {
 		if (configuration::useProxy)
 		{
@@ -35,7 +36,14 @@ CURLcode __fastcall hk_curl_easy_setopt(void* curlhandle, CURLoption opt, ...)
 	};
 
 	auto disableSSLPeer = [&result, &curlhandle]() {
-		result = curl_setopt(curlhandle, CURLOPT_SSL_VERIFYPEER, 0);
+		if (configuration::useProxy)
+		{
+			curl_setopt(curlhandle, CURLOPT_PROXY, configuration::forwardProxy.c_str());
+		}
+		if (configuration::disableSSL)
+		{
+			result = curl_setopt(curlhandle, CURLOPT_SSL_VERIFYPEER, 0);
+		}
 	};
 
 	auto disableSSLHost = [&result, &curlhandle]() {
@@ -61,14 +69,14 @@ CURLcode __fastcall hk_curl_easy_setopt(void* curlhandle, CURLoption opt, ...)
 	};
 
 	switch (opt) {
-		opthook(CURLOPT_SSL_VERIFYPEER, configuration::disableSSL, disableSSLPeer);
+		opthook(CURLOPT_SSL_VERIFYPEER, configuration::disableSSL || configuration::useProxy, disableSSLPeer);
 		setProxy();
 		break;
 		opthook(CURLOPT_SSL_VERIFYHOST, configuration::disableSSL, disableSSLHost);
 		break;
 		opthook(CURLOPT_PROXY, configuration::useProxy, setProxy);
 		break;
-		opthook(CURLOPT_URL, configuration::detourURL, setUrl);
+		opthook(CURLOPT_URL, configuration::detourURL || configuration::disableSSL, setUrl);
 		break;
 	default:
 	defaultBehavior:
@@ -95,10 +103,46 @@ __int64 hk_unsafe_environnement(__int64* a1, char a2, __int64 a3, char a4)
 }
 
 
-inline FIoStatus hkValidateContainerSignature(__int64 a1, __int64 a2, __int64 a3, __int64 a4, __int64 a5, __int64 a6)
+FIoStatus hkValidateContainerSignature(__int64 a1, __int64 a2, __int64 a3, __int64 a4, __int64 a5, __int64 a6)
 {
 	std::cout << "[plataniumv3] - replaced ValidateContainerSignature response succesfully" << std::endl;
 	return { EIoErrorCode::Ok, (TCHAR*)TEXT("OK")};
+}
+
+__int64 __fastcall hk_lws_create_context(__int16* a1)
+{
+	lws_context_creation_info* context_creation = reinterpret_cast<lws_context_creation_info*>(a1);
+
+	if (context_creation && configuration::useProxy)
+	{
+		size_t offset = configuration::forwardProxy.find(":");
+		std::string host = configuration::forwardProxy.substr(0, offset);
+		std::string port = configuration::forwardProxy.substr(configuration::forwardProxy.find(":")+1);
+		context_creation->http_proxy_address = host.c_str();
+		context_creation->http_proxy_port = (unsigned int)std::stoi(port);
+	}
+
+	return native::o_lws_create_context((short*)context_creation);
+}
+
+__int64 __fastcall hk_lws_client_connect_via_info(__int64 a1)
+{
+	lws_client_connect_info* connect_info = reinterpret_cast<lws_client_connect_info*>(a1);
+
+
+	if (connect_info)
+	{
+		connect_info->ssl_connection = 2;
+
+		std::cout << "ws path : " << connect_info->path << std::endl;
+		std::cout << "ws protocol : " << connect_info->protocol << std::endl;
+		std::cout << "ws host : " << connect_info->host << std::endl;
+		std::cout << "ws port : " << connect_info->port << std::endl;
+		std::cout << "ws address : " << connect_info->address << std::endl;
+	}
+
+
+	return native::o_lws_client_connect_via_info((__int64)connect_info);
 }
 
 void place_hooks(void)
@@ -117,5 +161,12 @@ void place_hooks(void)
 		//ValidateContainerSignature
 		MH_CreateHook((void*&)native::ValidateContainerSignature, hkValidateContainerSignature, nullptr);
 	}
+
+	if (configuration::debug_websockets)
+	{
+		MH_CreateHook((void*&)native::lws_create_context, hk_lws_create_context, (LPVOID*)&native::o_lws_create_context);
+		MH_CreateHook((void*&)native::lws_client_connect_via_info, hk_lws_client_connect_via_info, (LPVOID*)&native::o_lws_client_connect_via_info);
+	}
+
 	MH_EnableHook(MH_ALL_HOOKS);
 }

@@ -17,7 +17,6 @@ static const wchar_t* GET_ENGINE_VERSION = L"unreal-v%i-%s.dmp";
 static const wchar_t* GENGINE_STRING = L"Invalid Engine used, must be FortEngine or FortUnrealEdEngine";
 static const wchar_t* SHOULD_CHECK_PAK = L"heckpak";
 
-//ue4 structures
 struct FEngineVersionBase {
 	/** Major version number. */
 	uint16_t Major = 0;
@@ -31,6 +30,38 @@ struct FEngineVersionBase {
 	/** Changelist number. This is used to arbitrate when Major/Minor/Patch version numbers match. Use GetChangelist() instead of using this member directly. */
 	uint32_t Changelist = 0;
 };
+
+struct lws_context_creation_info {
+	int port;
+	const char* iface;
+	const struct lws_protocols* protocols;
+	const struct lws_extension* extensions;
+	const struct lws_token_limits* token_limits;
+	const char* ssl_private_key_password;
+	const char* ssl_cert_filepath;
+	const char* ssl_private_key_filepath;
+	const char* ssl_ca_filepath;
+	const char* ssl_cipher_list;
+	const char* http_proxy_address;
+	unsigned int http_proxy_port;
+};
+
+struct lws_client_connect_info {
+	struct lws_context* context;
+	const char* address;
+	int port;
+	int ssl_connection;
+	const char* path;
+	const char* host;
+	const char* origin;
+	const char* protocol;
+	int ietf_version_or_minus_one;
+	void* userdata;
+	const void* client_exts;
+	const char* method;
+};
+
+
 
 enum class EIoErrorCode
 {
@@ -81,6 +112,8 @@ namespace addresses {
 	inline void* get_engine_version;
 	inline void* should_check_pak;
 	inline void* validate_container_signature;
+	inline void* lws_client_connect_via_info;
+	inline void* lws_create_context;
 	inline void* game_engine;
 }
 
@@ -94,11 +127,17 @@ namespace native {
 	inline __int64(*should_check_pak)(void);
 	inline void*(__fastcall *fiostatus_tostring)(void*, void*);
 	inline FIoStatus(__fastcall* ValidateContainerSignature)(__int64 a1, __int64 a2, __int64 a3, __int64 a4, __int64 a5, __int64 a6);
+	inline __int64(__fastcall* lws_create_context)(__int16* a1);
+	inline __int64(__fastcall* lws_client_connect_via_info)(__int64 a1);
+
+	inline __int64(__fastcall* o_lws_create_context)(__int16* a1);
+	inline __int64(__fastcall* o_lws_client_connect_via_info)(__int64 a1);
 }
 
 namespace configuration {
 	inline bool disableSSL = false;
 	inline bool detourURL = false;
+	inline bool debug_websockets = false;
 	inline bool useProxy = false;
 	inline bool bypass_pak_checks = false;
 	inline std::string forwardProxy;

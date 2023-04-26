@@ -57,6 +57,7 @@ void read_config(std::filesystem::path config_path)
 	readData("detourURL", configuration::detourURL);
 	readData("useProxy", configuration::useProxy);
 	readData("disableSSL", configuration::disableSSL);
+	readData("debug_websockets", configuration::debug_websockets);
 	readData("forwardHost", configuration::forwardHost);
 	readData("forwardProxy", configuration::forwardProxy);
 	int forwardPort;
