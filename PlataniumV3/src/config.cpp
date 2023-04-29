@@ -1,44 +1,29 @@
 #include "../include/platanium.hpp"
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <regex>
 
 bool get_config_path(std::filesystem::path& out)
 {
-	int argc;
 
-	wchar_t** szArglist = CommandLineToArgvW(GetCommandLineW(), &argc);
 
-	if (szArglist == NULL)
+	
+	char* data = GetCommandLineA();
+
+	std::regex pattern(R"(-plataniumconfigpath=\"([^\"]+)\")");
+	std::smatch match;
+	std::string datastr = std::string(data);
+
+	if (std::regex_search(datastr, match, pattern))
 	{
-		MessageBoxA(0, "szArgList is NULL", "PlataniumV3", 0);
-		return false;
-	}
-
-	for (int i = 1; i < argc; ++i) {
-		std::wstring arg = szArglist[i];
-		size_t pos = arg.find(L'=');
-
-		if (pos != std::wstring::npos) {
-			std::wstring key = arg.substr(0, pos);
-			std::wstring value = arg.substr(pos + 1);
-
-			if (key.contains(L"plataniumconfigpath"))
-			{
-				std::filesystem::path configPath = std::filesystem::path(value);
-				std::cout << configPath.string() << std::endl;
-				if (std::filesystem::exists(configPath))
-				{
-					LocalFree(szArglist);
-					out = configPath;
-					return true;
-				}
-			}
+		if (std::filesystem::exists(match[1].str()))
+		{
+			out = match[1].str();
+			return true;
 		}
 	}
 
-	LocalFree(szArglist);
-
-	return false;
+    return false;
 }
 
 void read_config(std::filesystem::path config_path)
