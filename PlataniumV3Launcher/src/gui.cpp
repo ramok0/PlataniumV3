@@ -28,11 +28,6 @@ void render_main_form(void)
 		strcpy_s(buf2, sizeof(buf1), g_configuration->forwardProxy.c_str());
 		});
 
-	if (ImGui::Button("invalidate token"))
-	{
-		(*current_epic_account)->access_token[0] = '}';
-	}
-
 	const float inputFloat = 370.f;
 
 	//credits : https://github.com/FortniteModding/PlataniumV2
