@@ -96,12 +96,8 @@ public:
 	}
 
 private:
-
-
 	EIoErrorCode	ErrorCode = EIoErrorCode::Ok;
 	FErrorMessage	ErrorMessage;
-
-	friend class FIoStatusBuilder;
 };
 
 namespace addresses {
@@ -114,7 +110,6 @@ namespace addresses {
 	inline void* validate_container_signature;
 	inline void* lws_client_connect_via_info;
 	inline void* lws_create_context;
-	inline void* game_engine;
 }
 
 //native calls
