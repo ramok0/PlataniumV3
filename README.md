@@ -20,6 +20,15 @@ PlataniumV3 aims to be a swiss knife for Fortnite modders
 
 You can watch a video of me trying the program [here](https://streamable.com/j6qjjx)
 
+## Issues
+
+If you encounter an issue when using Platanium, you can [create an issue](https://github.com/Ramokprout/PlataniumV3/issues)
+
+When creating an issue, please provide :
+
+- your config.json (with or without token, it does not matter since they are ciphered)
+- the path to the folder that contains PlataniumV3.dll and config.json
+- the issue and how to reproduce it
 
 ## FAQ
 
