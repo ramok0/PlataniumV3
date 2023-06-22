@@ -5,9 +5,6 @@
 
 bool get_config_path(std::filesystem::path& out)
 {
-
-
-	
 	char* data = GetCommandLineA();
 
 	std::regex pattern(R"(-plataniumconfigpath=\"([^\"]+)\")");

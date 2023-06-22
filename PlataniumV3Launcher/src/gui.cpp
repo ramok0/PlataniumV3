@@ -1,5 +1,5 @@
 #include "../include/plataniumv3gui.hpp"
-
+#include <iostream>
 namespace ImGui {
 	void Align(float width, bool set_next_item_with = true, float alignment = 0.5f)
 	{
@@ -10,7 +10,7 @@ namespace ImGui {
 		{
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 
-			if(set_next_item_with)
+			if (set_next_item_with)
 				ImGui::SetNextItemWidth(width);
 		}
 	}
@@ -37,15 +37,12 @@ void render_main_form(void)
 
 	ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
 
-
 	//center the content vertically
 	float height = ImGui::GetContentRegionAvail().y;
 	ImGui::SetCursorPosY(height / 3);
 
 	ImGui::Align(inputFloat);
 	ImGui::Text(text.c_str());
-
-
 
 	ImGui::Align(inputFloat);
 	if (!g_configuration->useProxy)
@@ -72,7 +69,7 @@ void render_main_form(void)
 
 	float originalPosX = ImGui::GetCursorPosX();
 
-	ImVec2 boutonSize = { (static_cast<float>(inputFloat) - (style.ItemSpacing.x * 2)) / 3, 25.f};
+	ImVec2 boutonSize = { (static_cast<float>(inputFloat) - (style.ItemSpacing.x * 2)) / 3, 25.f };
 
 	ImGui::SetCursorPosX(originalPosX + centeroffset);
 	ImGui::Checkbox("Detour URL", &g_configuration->detourURL);
@@ -81,8 +78,8 @@ void render_main_form(void)
 	ImGui::Checkbox("Disable SSL", &g_configuration->disableSSL);
 	ImGui::SameLine();
 	ImGui::SetCursorPosX(originalPosX + centeroffset + (boutonSize.x + style.ItemSpacing.x) * 2);
-	ImGui::Checkbox("Use Proxy", &g_configuration->useProxy);	
-	
+	ImGui::Checkbox("Use Proxy", &g_configuration->useProxy);
+
 	ImGui::SetCursorPosX(originalPosX + centeroffset);
 
 	ImGui::Checkbox("Dump AES keys (experimental)", &g_configuration->dump_aes);
@@ -141,10 +138,10 @@ void render_main_form(void)
 
 	ImVec2 viewportSize = ImGui::GetMainViewport()->WorkSize;
 
-	std::string finalText = std::format("Found UE Version: {:.2f}\nPlataniumV3 - Made by @Ramokprout on github", g_configuration->fortnite_build.engine_version);
+	std::string finalText = std::format("Found UE Version: {:.2f}\nPlataniumV3 - Made by @ramok0 on github", g_configuration->fortnite_build.engine_version);
 	ImVec2 finalTextSize = ImGui::CalcTextSize(finalText.c_str());
 
-	ImGui::SetCursorPos({ 10.f, viewportSize.y - finalTextSize.y - 10.f});
+	ImGui::SetCursorPos({ 10.f, viewportSize.y - finalTextSize.y - 10.f });
 	ImGui::Text(finalText.c_str());
 }
 
@@ -246,7 +243,7 @@ void gui_render(void)
 			{
 				ImGui::InsertNotification({ ImGuiToastType_Warning, 3000, "Failed to find Fortnite Engine Version. Entering in compatibility mode." });
 			}
-			
+
 			if (PLATANIUM_LOG(write_configuration(), "write_configuration"))
 			{
 				ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Updated Fortnite directory successfully" });

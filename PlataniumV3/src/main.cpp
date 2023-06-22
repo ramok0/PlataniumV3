@@ -4,7 +4,7 @@ DWORD WINAPI Main(HMODULE hModule)
 {
 	console* con = new console();
 
-	std::cout << "Welcome to PlataniumV3, fully made by Ramok !" << std::endl;
+	std::cout << "Welcome to PlataniumV3, made by https://github.com/ramok0 !" << std::endl;
 
 	std::filesystem::path config_path;
 

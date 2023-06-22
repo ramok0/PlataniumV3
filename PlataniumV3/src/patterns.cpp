@@ -14,7 +14,14 @@ void find_patterns(void)
 	addresses::get_engine_version = Memcury::Scanner::FindStringRef(GET_ENGINE_VERSION).ScanFor({ 0xE8, WILDCARD,WILDCARD,WILDCARD,WILDCARD, 0x4C, 0x8B }, false).RelativeOffset(1).GetAs<void*>();
 	if (configuration::bypass_pak_checks)
 	{
-		addresses::validate_container_signature = Memcury::Scanner::FindPattern("40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 FF 45 33 ED").GetAs<void*>();
+		//if (GetEngineVersion() == 5.1f) {
+		//	addresses::validate_container_signature = Memcury::Scanner::FindPattern("40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 FF 45 33 ED").GetAs<void*>();
+		//}
+		//else {
+
+		//}
+
+		addresses::validate_container_signature = Memcury::Scanner::FindPattern("E8 ? ? ? ? 44 39 75 90 0F 85 ? ? ? ?").RelativeOffset(1).GetAs<void*>();
 	}
 
 	if (configuration::debug_websockets)
@@ -22,8 +29,6 @@ void find_patterns(void)
 		addresses::lws_client_connect_via_info = Memcury::Scanner::FindPattern("48 89 74 24 ? 57 48 83 EC 20 48 8B 71 30 48 8B F9").GetAs<void*>();
 		addresses::lws_create_context = Memcury::Scanner::FindPattern("40 57 48 83 EC 40 48 8B F9").GetAs<void*>();
 	}
-
-//	addresses::game_engine = Memcury::Scanner::FindStringRef(GENGINE_STRING)
 
 	log_pointer("curl_easy_setopt", addresses::curl_easy_setopt, true);
 	log_pointer("curl_setopt", addresses::curl_setopt, true);
