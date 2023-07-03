@@ -29,6 +29,8 @@ When creating an issue, please provide :
 - your config.json (with or without token, it does not matter since they are ciphered)
 - the path to the folder that contains PlataniumV3.dll and config.json
 - the issue and how to reproduce it
+- fortnite logs (if you can)
+- fortnite version
 
 ## FAQ
 
