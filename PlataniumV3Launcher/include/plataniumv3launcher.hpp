@@ -2,6 +2,7 @@
 #ifndef __PLATANIUMV3LAUNCHER__
 #define __PLATANIUMV3LAUNCHER__
 
+#include <string.h>
 #include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>
 #include <base64/base64.hpp>
@@ -45,6 +46,7 @@ struct fortnite_build_t {
 };
 
 struct configuration_t {
+	bool no_dll = false;
 	bool disableSSL = false;
 	bool detourURL = false;
 	bool useProxy = false;

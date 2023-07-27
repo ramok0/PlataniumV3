@@ -113,48 +113,49 @@ PLATANIUM_FAILURE_REASON start_fortnite_and_inject_dll(void)
 
 	CloseHandle(processInfo.hProcess);
 	CloseHandle(processInfo.hThread);
+	if (!g_configuration->no_dll) {
+		HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processInfo.dwProcessId);
 
-	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processInfo.dwProcessId);
+		if (hProcess == INVALID_HANDLE_VALUE)
+		{
+			spdlog::error("{} - Failed to open handle", __FUNCTION__);
+			return PLATANIUM_OS_ERROR;
+		}
 
-	if (hProcess == INVALID_HANDLE_VALUE)
-	{
-		spdlog::error("{} - Failed to open handle", __FUNCTION__);
-		return PLATANIUM_OS_ERROR;
+		LPVOID buffer = VirtualAllocEx(hProcess, nullptr, dllPath.string().size(), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+		if (!buffer)
+		{
+			spdlog::error("{} - VirtualAllocEx failed with error code: {}", __FUNCTION__, GetLastError());
+			//	ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to inject DLL" });
+			CloseHandle(hProcess);
+			return PLATANIUM_OS_ERROR;
+		}
+
+		std::string path = dllPath.string();
+
+		SIZE_T NumberOfBytesWritten;
+		if (!WriteProcessMemory(hProcess, buffer, path.c_str(), path.size(), &NumberOfBytesWritten))
+		{
+			spdlog::error("{} - WriteProcessMemory failed with error code: {}", __FUNCTION__, GetLastError());
+			//	ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to inject DLL" });
+			CloseHandle(hProcess);
+			return PLATANIUM_OS_ERROR;
+		}
+
+		HANDLE hLoadThread = CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)LoadLibraryAddress, buffer, 0, 0);
+
+		if (hLoadThread == INVALID_HANDLE_VALUE || hLoadThread == 0)
+		{
+			spdlog::error("{} - CreateRemoteThread failed with error code: {}", __FUNCTION__, GetLastError());
+			//	ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to inject DLL" });
+			CloseHandle(hProcess);
+			return PLATANIUM_OS_ERROR;
+		}
+
+		CloseHandle(hLoadThread);
+
+		spdlog::info("{} - Started Fortnite and injected DLL successfully, fortnite PID: {}", __FUNCTION__, processInfo.dwProcessId);
 	}
-
-	LPVOID buffer = VirtualAllocEx(hProcess, nullptr, dllPath.string().size(), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-	if (!buffer)
-	{
-		spdlog::error("{} - VirtualAllocEx failed with error code: {}", __FUNCTION__, GetLastError());
-	//	ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to inject DLL" });
-		CloseHandle(hProcess);
-		return PLATANIUM_OS_ERROR;
-	}
-
-	std::string path = dllPath.string();
-
-	SIZE_T NumberOfBytesWritten;
-	if (!WriteProcessMemory(hProcess, buffer, path.c_str(), path.size(), &NumberOfBytesWritten))
-	{
-		spdlog::error("{} - WriteProcessMemory failed with error code: {}", __FUNCTION__, GetLastError());
-	//	ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to inject DLL" });
-		CloseHandle(hProcess);
-		return PLATANIUM_OS_ERROR;
-	}
-
-	HANDLE hLoadThread = CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)LoadLibraryAddress, buffer, 0, 0);
-
-	if (hLoadThread == INVALID_HANDLE_VALUE || hLoadThread == 0)
-	{
-		spdlog::error("{} - CreateRemoteThread failed with error code: {}", __FUNCTION__, GetLastError());
-	//	ImGui::InsertNotification({ ImGuiToastType_Error, 3000, "Failed to inject DLL" });
-		CloseHandle(hProcess);
-		return PLATANIUM_OS_ERROR;
-	}
-
-	CloseHandle(hLoadThread);
-
-	spdlog::info("{} - Started Fortnite and injected DLL successfully, fortnite PID: {}", __FUNCTION__, processInfo.dwProcessId);
 //	ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Started Fortnite and Injected DLL successfully !" });
 
 	return PLATANIUM_NO_FAILURE;

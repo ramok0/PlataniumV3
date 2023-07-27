@@ -60,26 +60,34 @@ PLATANIUM_FAILURE_REASON parse_configuration(nlohmann::json& document, configura
 		json_get(document, "forwardHost", std::string, out->forwardHost)
 		json_get(document, "forwardProxy", std::string, out->forwardProxy)
 		json_get(document, "forwardPort", int, out->forwardPort)
-		json_get(document, "fortnite_path", std::string, out->fortnite_build.path)
-		if (!out->fortnite_build.path.empty())
-		{
-			PLATANIUM_FAILURE_REASON fortnite_find_verison_failure_reason = platalog_error(find_fortnite_engine_version(), "find_fortnite_engine_version");
-			if (!PLATANIUM_OK(fortnite_find_verison_failure_reason))
-			{
-				return PLATANIUM_FAILURE_REASON::PLATANIUM_FAILED_TO_PARSE;
-			}
-		}
+		json_get(document, "fortnite_path", std::string, out->fortnite_build.path);
 
-		if (document.find("device_auth") != document.end())
-		{
-			json_get(document["device_auth"], "account_id", std::string, out->deviceAuth.account_id);
-			json_get(document["device_auth"], "device_id", std::string, out->deviceAuth.device_id);
+	//update old config.json file
+	if (document.find("no_dll") == document.end()) {
+		document["no_dll"] = false;
+	}
 
-			if (document["device_auth"]["secret"].is_string())
-			{
-				out->deviceAuth.secret = document["device_auth"]["secret"].get<std::string>();
-			}
+	json_get(document, "no_dll", bool, g_configuration->no_dll);
+
+	if (!out->fortnite_build.path.empty())
+	{
+		PLATANIUM_FAILURE_REASON fortnite_find_verison_failure_reason = platalog_error(find_fortnite_engine_version(), "find_fortnite_engine_version");
+		if (!PLATANIUM_OK(fortnite_find_verison_failure_reason))
+		{
+			return PLATANIUM_FAILURE_REASON::PLATANIUM_FAILED_TO_PARSE;
 		}
+	}
+
+	if (document.find("device_auth") != document.end())
+	{
+		json_get(document["device_auth"], "account_id", std::string, out->deviceAuth.account_id);
+		json_get(document["device_auth"], "device_id", std::string, out->deviceAuth.device_id);
+
+		if (document["device_auth"]["secret"].is_string())
+		{
+			out->deviceAuth.secret = document["device_auth"]["secret"].get<std::string>();
+		}
+	}
 
 	return PLATANIUM_NO_FAILURE;
 }

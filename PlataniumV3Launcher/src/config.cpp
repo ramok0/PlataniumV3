@@ -16,6 +16,7 @@ PLATANIUM_FAILURE_REASON create_default_config(void)
 	g_configuration->forwardProxy = "";
 	g_configuration->dump_aes = false;
 	g_configuration->debug_websockets = false;
+	g_configuration->no_dll = false;
 	
 	fs::path outFortntePath;
 	if (PLATANIUM_OK(platalog_error(fortnite_find_default_installation_path(outFortntePath), "fortnite_find_default_installation_path")))
@@ -83,7 +84,8 @@ PLATANIUM_FAILURE_REASON write_configuration(void)
 		{"fortnite_path", g_configuration->fortnite_build.path},
 		{"should_check_pak", g_configuration->should_check_pak},
 		{"dump_aes", g_configuration->dump_aes},
-		{"debug_websockets", g_configuration->debug_websockets}
+		{"debug_websockets", g_configuration->debug_websockets},
+		{"no_dll", g_configuration->no_dll},
 	};
 
 	if (!g_configuration->deviceAuth.account_id.empty() && !g_configuration->deviceAuth.device_id.empty() && !g_configuration->deviceAuth.secret.empty())
