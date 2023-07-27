@@ -118,6 +118,10 @@ void render_main_form(void)
 			}).detach();
 	}
 
+	if (g_configuration->no_dll && ImGui::IsItemHovered()) {
+		ImGui::SetTooltip("Warning : NoDLL is enabled, your game will probably not work as expected.");
+	}
+
 	ImGui::SameLine();
 	if (ImGui::Button("Edit Fortnite Path", boutonSize))
 	{
