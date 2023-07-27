@@ -101,10 +101,10 @@ void render_main_form(void)
 		ImGui::SetTooltip("This will probably destroy every websocket communication in your Fortnite Client.");
 	}
 
+	ImGui::SetCursorPosX(originalPosX + centeroffset);
 	ImGui::Checkbox("No DLL", &g_configuration->no_dll);
 
 	ImGui::Align(boutonSize.x * 3 + ImGui::GetStyle().ItemSpacing.x * 2, false);
-
 	if (ImGui::Button("Start Fortnite", boutonSize))
 	{
 		std::thread([]() {
