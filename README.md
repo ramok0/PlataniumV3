@@ -5,11 +5,17 @@ PlataniumV3 aims to be a swiss knife for Fortnite modders
 ## Features
 
 - Save account safely
-- Dump AES keys
 - Bypass UE5 signatures checks
 - Detour URL
 - Disable SSL
 - Set proxy to attach any http debugger
+
+## Upcomming features
+
+- Dump AES keys
+- Custom arguments
+- Offline mode
+- Support for third-party private servers
 
 ## Installation
 
