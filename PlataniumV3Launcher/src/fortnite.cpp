@@ -43,9 +43,9 @@ PLATANIUM_FAILURE_REASON fortnite_find_default_installation_path(fs::path& fortn
 	return PLATANIUM_FAILED_TO_PARSE;
 }
 
-std::string generate_fortnite_start_arguments(fs::path fortnitePath, fs::path configPath, std::string exchangeCode)
+std::string generate_fortnite_start_arguments(fs::path fortnitePath, fs::path configPath, std::string exchangeCode, std::string ac, std::string caldera)
 {
-	return std::format("\"{}\" -EpicPortal -AUTH_LOGIN=unused -AUTH_PASSWORD={} -AUTH_TYPE=exchangecode -epicapp=Fortnite -epicenv=Prod -epicusername={} -epicuserid={} -nobe -noeac -plataniumconfigpath=\"{}\"", fortnitePath.string(), exchangeCode, (*current_epic_account)->display_name, (*current_epic_account)->account_id, configPath.string());
+	return std::format("\"{}\" -EpicPortal -AUTH_LOGIN=unused -AUTH_PASSWORD={} -AUTH_TYPE=exchangecode -epicapp=Fortnite -epicenv=Prod -epicusername={} -epicuserid={} -noeac -noeaceos -fromfl={} -caldera={} -frombe -plataniumconfigpath=\"{}\"", fortnitePath.string(), exchangeCode, (*current_epic_account)->display_name, (*current_epic_account)->account_id,ac, caldera, configPath.string());
 }
 
 PLATANIUM_FAILURE_REASON start_fortnite_and_inject_dll(void)
@@ -91,6 +91,20 @@ PLATANIUM_FAILURE_REASON start_fortnite_and_inject_dll(void)
 		}
 	}
 
+	std::string caldera;
+	std::string ac;
+
+	PLATANIUM_FAILURE_REASON caldera_failure_reason = epic_get_caldera((*current_epic_account)->account_id, exchangeCode, ac, caldera);
+
+	if (PLATANIUM_OK(platalog_error(caldera_failure_reason, "epic_get_caldera")))
+	{
+		spdlog::debug("Caldera Token : {}", caldera);
+		spdlog::debug("Caldera AC : {}", ac);
+	}
+	else {
+		spdlog::warn("failed to get caldera code, game will probably not work as excepted");
+	}
+
 	fs::path configPath = fs::current_path() / "config.json";
 
 	if (!fs::exists(configPath))
@@ -104,7 +118,7 @@ PLATANIUM_FAILURE_REASON start_fortnite_and_inject_dll(void)
 
 	STARTUPINFOA startupInfo{ 0 };
 	PROCESS_INFORMATION processInfo{ 0 };
-	std::string arguments = generate_fortnite_start_arguments(fortniteBinary, configPath, exchangeCode);
+	std::string arguments = generate_fortnite_start_arguments(fortniteBinary, configPath, exchangeCode, ac, caldera);
 	if (!CreateProcessA(nullptr, (LPSTR)arguments.c_str(), nullptr, nullptr, false, 0, nullptr, fortniteBinary.parent_path().string().c_str(), &startupInfo, &processInfo))
 	{
 		spdlog::error("{} - Failed to create fortnite process, error : {}", __FUNCTION__,GetLastError());

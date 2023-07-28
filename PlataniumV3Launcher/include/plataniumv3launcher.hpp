@@ -23,6 +23,7 @@ constexpr const char* EPIC_GENERATE_AUTHORIZATION_CODE_URL = "https://www.epicga
 constexpr const char* EPIC_GENERATE_TOKEN_URL = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token";
 constexpr const char* EPIC_GENERATE_DEVICE_AUTH = "https://account-public-service-prod.ol.epicgames.com/account/api/public/account/{}/deviceAuth";
 constexpr const char* EPIC_GENERATE_EXCHANGE_CODE = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/exchange";
+constexpr const char* EPIC_CALDERA_ENDPOINT = "https://caldera-service-prod.ecosec.on.epicgames.com/caldera/api/v1/launcher/racp";
 //structures
 
 struct epic_account_t {
@@ -76,6 +77,7 @@ typedef enum {
 	PLATANIUM_FAILED_TO_DECRYPT,
 	PLATANIUM_FAILED_TO_CRYPT,
 	PLATANIUM_FAILED_TO_CREATE_EXCHANGE_CODE,
+	PLATANIUM_FAILED_TO_GET_CALDERA,
 	PLATANIUM_FAILED_TO_REFRESH_TOKEN,
 	PLATANIUM_JSON_INVALID,
 	PLATANIUM_JSON_MISSING_KEY,
@@ -111,6 +113,10 @@ std::string epic_create_basic_authorization(std::string client_id, std::string c
 
 //create exchange code
 PLATANIUM_FAILURE_REASON epic_create_exchange_code(std::string& out);
+
+//get caldera code
+
+PLATANIUM_FAILURE_REASON epic_get_caldera(std::string account_id, std::string exchange_code, std::string& ac, std::string& caldera);
 
 /*parsers related functions*/
 

@@ -14,13 +14,6 @@ void find_patterns(void)
 	addresses::get_engine_version = Memcury::Scanner::FindStringRef(GET_ENGINE_VERSION).ScanFor({ 0xE8, WILDCARD,WILDCARD,WILDCARD,WILDCARD, 0x4C, 0x8B }, false).RelativeOffset(1).GetAs<void*>();
 	if (configuration::bypass_pak_checks)
 	{
-		//if (GetEngineVersion() == 5.1f) {
-		//	addresses::validate_container_signature = Memcury::Scanner::FindPattern("40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 FF 45 33 ED").GetAs<void*>();
-		//}
-		//else {
-
-		//}
-
 		addresses::validate_container_signature = Memcury::Scanner::FindPattern("E8 ? ? ? ? 44 39 75 90 0F 85 ? ? ? ?").RelativeOffset(1).GetAs<void*>();
 	}
 

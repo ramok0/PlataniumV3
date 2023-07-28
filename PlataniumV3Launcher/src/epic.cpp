@@ -158,3 +158,45 @@ PLATANIUM_FAILURE_REASON epic_create_exchange_code(std::string& out)
 
 	return PLATANIUM_NO_FAILURE;
 }
+
+PLATANIUM_FAILURE_REASON epic_get_caldera(std::string account_id, std::string exchange_code, std::string& ac, std::string& caldera)
+{
+	nlohmann::json body = {
+		{"account_id", account_id},
+		{"exchange_code", exchange_code},
+		{"test_mode", false },
+		{"epic_app", "fortnite"},
+		{"nvidia", false},
+		{"luna", false}
+	};
+
+	cpr::Response response = cpr::Post(
+		cpr::Url(EPIC_CALDERA_ENDPOINT),
+		cpr::Body(body.dump().c_str())
+	);
+
+	if (response.status_code != 200) {
+		return PLATANIUM_FAILED_TO_GET_CALDERA;
+	}
+
+	nlohmann::json response_body = nlohmann::json::parse(response.text);
+
+	if (response_body.find("jwt") == response_body.end() || response_body.find("provider") == response_body.end()) return PLATANIUM_FAILED_TO_GET_CALDERA;
+
+	std::string provider = response_body["provider"].get<std::string>();
+
+	spdlog::debug("Caldera Provider : {}", provider);
+
+	ac = "unk";
+
+	if (provider == "EasyAntiCheat") {
+		ac = "eac";
+	}
+	else if (provider == "BattlEye") {
+		ac = "be";
+	}
+
+	caldera = response_body["jwt"].get<std::string>();
+
+	return PLATANIUM_NO_FAILURE;
+}
