@@ -192,6 +192,9 @@ PLATANIUM_FAILURE_REASON epic_get_caldera(std::string account_id, std::string ex
 	if (provider == "EasyAntiCheat") {
 		ac = "eac";
 	}
+	else if (provider == "EasyAntiCheatEOS") {
+		ac = "eaceos";
+	}
 	else if (provider == "BattlEye") {
 		ac = "be";
 	}
