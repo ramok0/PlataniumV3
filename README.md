@@ -1,21 +1,20 @@
 
 # PlataniumV3
 
-PlataniumV3 aims to be a swiss knife for Fortnite modders
+PlataniumV3 is a user-friendly modding tool designed specifically for Fortnite. With a wide array of features, it aims to be the go-to swiss knife for Fortnite modders, providing them with the necessary tools to enhance their gaming experience.
+
 ## Features
 
-- Save account safely
-- Bypass UE5 signatures checks
-- Detour URL
-- Disable SSL
-- Set proxy to attach any http debugger
-
-## Upcomming features
-
-- Dump AES keys
-- Custom arguments
-- Offline mode
-- Support for third-party private servers
+- **Secure Account Management** : Safely save your Fortnite accounts within the tool.
+- **Signature Bypass** : Bypass UE5 signature checks to enable custom paks modifications.
+- **URL Detour** : Redirect Fortnite traffic through another private server
+- **SSL Disabler** : Disable SSL to attach any HTTP debugger for detailed analysis.
+- **Proxy Setter**: Set proxies to facilitate debugging through HTTP interceptors.
+- **Upcoming Features** : We are continuously working to improve PlataniumV3, and upcoming features include:
+  - AES key dumping for advanced decryption.
+  - Custom arguments for more personalized mods.
+  - Offline mode for uninterrupted modding.
+  - Support for third-party private servers for extended flexibility.
 
 ## Installation
 
@@ -42,7 +41,7 @@ We welcome contributions from the community to make PlataniumV3 even better. Fee
 
 ## FAQ
 
-#### Can i get banned using this ?
+#### Can I get banned using this tool?
 
 - No, you can't. PlataniumV3 operates independently from any anti-cheat systems running alongside Fortnite, ensuring a safe modding experience.
 
