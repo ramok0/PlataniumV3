@@ -1,7 +1,8 @@
 
 # PlataniumV3
 
-PlataniumV3 is a user-friendly modding tool designed specifically for Fortnite. With a wide array of features, it aims to be the go-to swiss knife for Fortnite modders, providing them with the necessary tools to enhance their gaming experience.
+- PlataniumV3 is a user-friendly modding tool designed specifically for Fortnite. 
+- With a wide array of features, it aims to be the go-to swiss knife for Fortnite modders, providing them with the necessary tools to enhance their gaming experience.
 
 ## Features
 
@@ -18,9 +19,9 @@ PlataniumV3 is a user-friendly modding tool designed specifically for Fortnite. 
 
 ## Installation
 
-- Download the pre-built binary
-- Start PlataniumV3Launcher.exe
-- You're done
+- Download the pre-built binary from the [Releases](https://github.com/ramok0/PlataniumV3/releases/latest) section.
+- Launch **PlataniumV3Launcher.exe**.
+- You're all set to begin modding Fortnite effortlessly!
 ## Demo
 
 You can watch a video of me trying the program [here](https://streamable.com/j6qjjx)
