@@ -100,6 +100,15 @@ private:
 	FErrorMessage	ErrorMessage;
 };
 
+struct FAESKey
+{
+	static constexpr int32_t KeySize = 32;
+public:
+	uint8_t Key[KeySize];
+
+	std::string to_hex_string(void);
+};
+
 namespace addresses {
 	inline void* curl_easy_setopt;
 	inline void* curl_setopt;
@@ -110,6 +119,7 @@ namespace addresses {
 	inline void* validate_container_signature;
 	inline void* lws_client_connect_via_info;
 	inline void* lws_create_context;
+	inline void* decrypt_data;
 }
 
 //native calls
@@ -127,6 +137,8 @@ namespace native {
 
 	inline __int64(__fastcall* o_lws_create_context)(__int16* a1);
 	inline __int64(__fastcall* o_lws_client_connect_via_info)(__int64 a1);
+	inline __int64(__fastcall* DecryptData)(unsigned __int8*, __int64, const struct FAESKey*);
+	inline __int64(__fastcall* o_DecryptData)(unsigned __int8*, __int64, const struct FAESKey*);
 }
 
 namespace configuration {

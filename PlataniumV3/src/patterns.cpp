@@ -23,10 +23,14 @@ void find_patterns(void)
 		addresses::lws_create_context = Memcury::Scanner::FindPattern("40 57 48 83 EC 40 48 8B F9").GetAs<void*>();
 	}
 
-
+	if (configuration::dump_aes)
+	{
+		addresses::decrypt_data = Memcury::Scanner::FindPattern("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20 49 8B D8 48 8B FA 48 8B F1 E8 ? ? ? ? 4C 8B C7").GetAs<void*>();
+	}
 
 	log_pointer("curl_easy_setopt", addresses::curl_easy_setopt, true);
 	log_pointer("curl_setopt", addresses::curl_setopt, true);
+	log_pointer("FAES::DecryptData", addresses::decrypt_data, true);
 	log_pointer("FEngineVersion::Current", addresses::get_engine_version, true);
 	log_pointer("FGenericPlatformMisc::RequestExitWithStatus", addresses::request_exit_with_status, true);
 	log_pointer("UnsafeEnvironnement", addresses::unsafeenvironnement, true);
@@ -46,6 +50,8 @@ void assign_natives(void)
 	assign(native::request_exit_with_status, addresses::request_exit_with_status);
 	assign(native::unsafe_environnement, addresses::unsafeenvironnement);
 	assign(native::ValidateContainerSignature, addresses::validate_container_signature);
+
+	assign(native::DecryptData, addresses::decrypt_data);
 	if (configuration::debug_websockets)
 	{
 		assign(native::lws_create_context, addresses::lws_create_context);

@@ -2,6 +2,7 @@
 #include <cxxurl/url.hpp>
 #include <minhook/MinHook.h>
 #include <array>
+#include <fstream>
 #pragma comment(lib, "lib/minhook/minhook.lib")
 
 #define opthook(opt, condition, firstmodif) \
@@ -12,7 +13,7 @@
             goto defaultBehavior; \
         } \
 
-
+inline std::vector<std::string> found_keys;
 
 
 CURLcode __fastcall hk_curl_easy_setopt(void* curlhandle, CURLoption opt, ...)
@@ -145,6 +146,27 @@ __int64 __fastcall hk_lws_client_connect_via_info(__int64 a1)
 	return native::o_lws_client_connect_via_info((__int64)connect_info);
 }
 
+//	inline __int64(__fastcall* DecryptData)(unsigned __int8*, __int64, const struct FAESKey*);
+__int64 hkDecryptData(unsigned __int8* Contents, __int64 NumBytes, FAESKey* KeyBytes) {
+
+	std::string key = KeyBytes->to_hex_string();
+
+	if (std::find(found_keys.begin(), found_keys.end(), key) == found_keys.end()) {
+		std::cout << "FOUND AES KEY : " << key << std::endl;
+
+		std::ofstream file;
+		file.open("aes_keys.txt", std::ios::app);
+
+		file << key << std::endl;
+
+		file.close();
+
+		found_keys.push_back(key);
+	}
+	
+	return native::o_DecryptData(Contents, NumBytes, KeyBytes);
+}
+
 void place_hooks(void)
 {
 	MH_Initialize();
@@ -160,6 +182,11 @@ void place_hooks(void)
 	{
 		//ValidateContainerSignature
 		MH_CreateHook((void*&)native::ValidateContainerSignature, hkValidateContainerSignature, nullptr);
+	}
+
+	if (configuration::dump_aes)
+	{
+		MH_CreateHook((void*&)native::DecryptData, hkDecryptData, (LPVOID*)&native::o_DecryptData);
 	}
 
 	if (configuration::debug_websockets)

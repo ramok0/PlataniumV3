@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\cxxurl\url.cpp" />
+    <ClCompile Include="src\aeskey.cpp" />
     <ClCompile Include="src\config.cpp" />
     <ClCompile Include="src\hooks.cpp" />
     <ClCompile Include="src\logger.cpp" />
