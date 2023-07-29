@@ -24,6 +24,15 @@ constexpr const char* EPIC_GENERATE_TOKEN_URL = "https://account-public-service-
 constexpr const char* EPIC_GENERATE_DEVICE_AUTH = "https://account-public-service-prod.ol.epicgames.com/account/api/public/account/{}/deviceAuth";
 constexpr const char* EPIC_GENERATE_EXCHANGE_CODE = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/exchange";
 constexpr const char* EPIC_CALDERA_ENDPOINT = "https://caldera-service-prod.ecosec.on.epicgames.com/caldera/api/v1/launcher/racp";
+
+//caldera providers
+
+static std::unordered_map<std::string, std::string> caldera_providers = {
+	{"EasyAntiCheat", "eac"},
+	{"EasyAntiCheatEOS", "eaceos"},
+	{"BattlEye", "be"}
+};
+
 //structures
 
 struct epic_account_t {
@@ -138,7 +147,7 @@ PLATANIUM_FAILURE_REASON fortnite_find_default_installation_path(fs::path& fortn
 //start fortnite client and injects dll
 PLATANIUM_FAILURE_REASON start_fortnite_and_inject_dll(void);
 //generate arguments to start fortnite
-std::string generate_fortnite_start_arguments(fs::path fortnitePath, fs::path configPath, std::string exchangeCode);
+std::string generate_fortnite_start_arguments(fs::path fortnitePath, fs::path configPath, std::string exchangeCode, std::string ac, std::string caldera);
 //verify fortnite directory
 PLATANIUM_FAILURE_REASON verify_fortnite_directory(fs::path directory);
 //find fortnite path staticly

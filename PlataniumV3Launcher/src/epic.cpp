@@ -187,17 +187,7 @@ PLATANIUM_FAILURE_REASON epic_get_caldera(std::string account_id, std::string ex
 
 	spdlog::debug("Caldera Provider : {}", provider);
 
-	ac = "unk";
-
-	if (provider == "EasyAntiCheat") {
-		ac = "eac";
-	}
-	else if (provider == "EasyAntiCheatEOS") {
-		ac = "eaceos";
-	}
-	else if (provider == "BattlEye") {
-		ac = "be";
-	}
+	ac = caldera_providers.contains(provider) ? caldera_providers[provider] : "unk";
 
 	caldera = response_body["jwt"].get<std::string>();
 
