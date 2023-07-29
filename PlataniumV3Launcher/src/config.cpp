@@ -17,6 +17,8 @@ PLATANIUM_FAILURE_REASON create_default_config(void)
 	g_configuration->dump_aes = false;
 	g_configuration->debug_websockets = false;
 	g_configuration->no_dll = false;
+	g_configuration->use_custom_arguments = false;
+	g_configuration->custom_arguments = "";
 	
 	fs::path outFortntePath;
 	if (PLATANIUM_OK(platalog_error(fortnite_find_default_installation_path(outFortntePath), "fortnite_find_default_installation_path")))

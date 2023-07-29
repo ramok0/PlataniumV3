@@ -61,6 +61,7 @@ PLATANIUM_FAILURE_REASON parse_configuration(nlohmann::json& document, configura
 		json_get(document, "forwardProxy", std::string, out->forwardProxy)
 		json_get(document, "forwardPort", int, out->forwardPort)
 		json_get(document, "fortnite_path", std::string, out->fortnite_build.path);
+		json_get(document, "dump_aes", bool, out->dump_aes);
 
 
 	//update old config.json file

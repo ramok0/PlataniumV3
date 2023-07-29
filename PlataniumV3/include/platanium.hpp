@@ -155,7 +155,9 @@ public:
 
 //functions definitions
 
+//freeze every threads of the process except the current thread
 void freeze_all_threads(void);
+//resume every threads
 void resume_all_threads(void);
 void find_patterns(void);
 void assign_natives(void);
