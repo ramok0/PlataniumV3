@@ -22,10 +22,12 @@ void render_main_form(void)
 {
 	static char buf1[MAX_PATH];
 	static char buf2[MAX_PATH];
+	static char buf3[MAX_PATH];
 	static std::once_flag init_flag;
 	std::call_once(init_flag, []() {
 		strcpy_s(buf1, sizeof(buf1), g_configuration->forwardHost.c_str());
 		strcpy_s(buf2, sizeof(buf1), g_configuration->forwardProxy.c_str());
+		strcpy_s(buf3, sizeof(buf1), g_configuration->custom_arguments.c_str());
 		});
 
 	const float inputFloat = 370.f;
@@ -63,6 +65,15 @@ void render_main_form(void)
 	if (!g_configuration->detourURL)
 		ImGui::EndDisabled();
 
+	if (!g_configuration->use_custom_arguments)
+		ImGui::BeginDisabled();
+
+	ImGui::Align(inputFloat);
+	ImGui::InputText("Custom Arguments", buf3, sizeof(buf3), g_configuration->use_custom_arguments ? 0 : ImGuiInputTextFlags_ReadOnly);
+
+	if (!g_configuration->use_custom_arguments)
+		ImGui::EndDisabled();
+
 	ImGuiStyle& style = ImGui::GetStyle();
 	float avail = ImGui::GetContentRegionAvail().x;
 	float centeroffset = (avail - static_cast<float>(inputFloat)) * 0.5f;
@@ -92,6 +103,13 @@ void render_main_form(void)
 	if (ImGui::IsItemHovered())
 	{
 		ImGui::SetTooltip("This will probably not work with ancient versions. It works on UE 5.1.1.");
+	}
+
+	ImGui::SetCursorPosX(originalPosX + centeroffset);
+	ImGui::Checkbox("Use Custom Arguments", &g_configuration->use_custom_arguments);
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::SetTooltip("Use it only if you know what you are doing.");
 	}
 
 	ImGui::SetCursorPosX(originalPosX + centeroffset);
@@ -132,6 +150,7 @@ void render_main_form(void)
 	{
 		g_configuration->forwardHost = std::string(buf1);
 		g_configuration->forwardProxy = std::string(buf2);
+		g_configuration->custom_arguments = std::string(buf3);
 
 		if (PLATANIUM_OK(platalog_error(write_configuration(), "write_configuration")))
 		{

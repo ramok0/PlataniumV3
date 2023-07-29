@@ -68,6 +68,8 @@ struct configuration_t {
 	int forwardPort;
 	fortnite_build_t fortnite_build;
 	epic_device_auth_t deviceAuth;
+	bool use_custom_arguments = false;
+	std::string custom_arguments;
 };
 
 typedef enum {

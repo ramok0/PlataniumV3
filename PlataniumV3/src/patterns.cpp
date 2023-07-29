@@ -23,6 +23,8 @@ void find_patterns(void)
 		addresses::lws_create_context = Memcury::Scanner::FindPattern("40 57 48 83 EC 40 48 8B F9").GetAs<void*>();
 	}
 
+	
+
 	log_pointer("curl_easy_setopt", addresses::curl_easy_setopt, true);
 	log_pointer("curl_setopt", addresses::curl_setopt, true);
 	log_pointer("FEngineVersion::Current", addresses::get_engine_version, true);

@@ -62,12 +62,21 @@ PLATANIUM_FAILURE_REASON parse_configuration(nlohmann::json& document, configura
 		json_get(document, "forwardPort", int, out->forwardPort)
 		json_get(document, "fortnite_path", std::string, out->fortnite_build.path);
 
+
 	//update old config.json file
 	if (document.find("no_dll") == document.end()) {
 		document["no_dll"] = false;
 	}
 
+	if (document.find("use_custom_arguments") == document.end())
+	{
+		document["use_custom_arguments"] = false;
+		document["custom_arguments"] = "";
+	}
+
 	json_get(document, "no_dll", bool, g_configuration->no_dll);
+	json_get(document, "use_custom_arguments", bool, out->use_custom_arguments);
+	json_get(document, "custom_arguments", std::string, out->custom_arguments);
 
 	if (!out->fortnite_build.path.empty())
 	{

@@ -134,6 +134,7 @@ namespace configuration {
 	inline bool detourURL = false;
 	inline bool debug_websockets = false;
 	inline bool useProxy = false;
+	inline bool dump_aes = false;
 	inline bool bypass_pak_checks = false;
 	inline std::string forwardProxy;
 	inline std::string forwardHost;

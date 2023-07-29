@@ -86,6 +86,8 @@ PLATANIUM_FAILURE_REASON write_configuration(void)
 		{"dump_aes", g_configuration->dump_aes},
 		{"debug_websockets", g_configuration->debug_websockets},
 		{"no_dll", g_configuration->no_dll},
+		{"use_custom_arguments", g_configuration->use_custom_arguments},
+		{"custom_arguments", g_configuration->custom_arguments},
 	};
 
 	if (!g_configuration->deviceAuth.account_id.empty() && !g_configuration->deviceAuth.device_id.empty() && !g_configuration->deviceAuth.secret.empty())

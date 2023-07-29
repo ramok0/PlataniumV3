@@ -42,6 +42,7 @@ void read_config(std::filesystem::path config_path)
 	readData("debug_websockets", configuration::debug_websockets);
 	readData("forwardHost", configuration::forwardHost);
 	readData("forwardProxy", configuration::forwardProxy);
+	readData("dump_aes", configuration::dump_aes);
 	int forwardPort;
 	readData("forwardPort", forwardPort);
 	configuration::forwardPort = std::to_string(forwardPort);
