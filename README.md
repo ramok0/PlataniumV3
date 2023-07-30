@@ -16,6 +16,7 @@
   - Custom arguments for more personalized mods.
   - Offline mode for uninterrupted modding.
   - Support for third-party private servers for extended flexibility.
+  - Complete support for older versions of Fortnite
 
 ## Installation
 
