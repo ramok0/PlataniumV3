@@ -3,6 +3,7 @@
 #include <minhook/MinHook.h>
 #include <array>
 #include <fstream>
+#include <stacktrace>
 #pragma comment(lib, "lib/minhook/minhook.lib")
 
 #define opthook(opt, condition, firstmodif) \
@@ -94,7 +95,6 @@ CURLcode __fastcall hk_curl_easy_setopt(void* curlhandle, CURLoption opt, ...)
 void hk_request_exit_with_status(bool, uint8_t)
 {
 	std::cout << "[plataniumv3] - successfully bypassed request exit with status" << std::endl;
-	return;
 }
 
 __int64 hk_unsafe_environnement(__int64* a1, char a2, __int64 a3, char a4)
@@ -121,6 +121,8 @@ __int64 __fastcall hk_lws_create_context(__int16* a1)
 		std::string port = configuration::forwardProxy.substr(configuration::forwardProxy.find(":")+1);
 		context_creation->http_proxy_address = host.c_str();
 		context_creation->http_proxy_port = (unsigned int)std::stoi(port);
+
+		std::cout << "attached proxy " << host << ":" << port << " into ws successfully" << std::endl;
 	}
 
 	return native::o_lws_create_context((short*)context_creation);
@@ -133,13 +135,15 @@ __int64 __fastcall hk_lws_client_connect_via_info(__int64 a1)
 
 	if (connect_info)
 	{
-		connect_info->ssl_connection = 2;
+	//	connect_info->ssl_connection = 2;
 
 		std::cout << "ws path : " << connect_info->path << std::endl;
 		std::cout << "ws protocol : " << connect_info->protocol << std::endl;
 		std::cout << "ws host : " << connect_info->host << std::endl;
 		std::cout << "ws port : " << connect_info->port << std::endl;
 		std::cout << "ws address : " << connect_info->address << std::endl;
+
+		//std::cout << std::stacktrace::current() << std::endl;
 	}
 
 
@@ -192,7 +196,7 @@ void place_hooks(void)
 	if (configuration::debug_websockets)
 	{
 		MH_CreateHook((void*&)native::lws_create_context, hk_lws_create_context, (LPVOID*)&native::o_lws_create_context);
-		MH_CreateHook((void*&)native::lws_client_connect_via_info, hk_lws_client_connect_via_info, (LPVOID*)&native::o_lws_client_connect_via_info);
+		//MH_CreateHook((void*&)native::lws_client_connect_via_info, hk_lws_client_connect_via_info, (LPVOID*)&native::o_lws_client_connect_via_info);
 	}
 
 	MH_EnableHook(MH_ALL_HOOKS);
