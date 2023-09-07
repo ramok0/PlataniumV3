@@ -1,6 +1,9 @@
 
 # PlataniumV3
 
+## PLEASE READ [THIS](https://github.com/ramok0/PlataniumV3/issues/12).
+
+
 - PlataniumV3 is a user-friendly modding tool designed specifically for Fortnite. 
 - With a wide array of features, it aims to be the go-to swiss knife for Fortnite modders.
 
