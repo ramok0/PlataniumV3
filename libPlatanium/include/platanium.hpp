@@ -34,11 +34,13 @@ namespace platanium {
 		EPIC_AUTHORIZATION_CODE,
 		EPIC_REFRESH_TOKEN,
 		EPIC_EXCHANGE_CODE,
+		EPIC_DEVICE_CODE,
 		METHOD_UNKNOWN
 	};
 
 	typedef std::pair<std::string, std::string> Header;
 	typedef std::vector<Header> HeaderContainer;
+	typedef std::pair<const char*, const char*> AuthClient;
 	typedef std::pair<std::string, std::optional<std::string>> Argument;
 	typedef std::vector<Argument> ArgumentContainer;
 
@@ -95,19 +97,23 @@ namespace platanium {
 
 		struct RefreshToken {
 			std::string refresh_token;
+		};	
+		
+		struct DeviceCode {
+			std::string device_code;
 		};
 
 		struct EpicGamesAccount {
-			platanium::TOKEN_METHOD type;
 			std::string client_id;
 		};
 
-		struct Credentials : public AuthorizationCode, public RefreshToken, public ExchangeCode, public EpicGamesAccount {
+		struct Credentials : public AuthorizationCode, public RefreshToken, public ExchangeCode, public DeviceCode, public EpicGamesAccount {
+			platanium::TOKEN_METHOD type;
 
 			nlohmann::json to_json(void);
 
 			operator bool() {
-				return !refresh_token.empty() || !authorization_code.empty() || !exchange_code.empty() || !client_id.empty();
+				return !refresh_token.empty() || !authorization_code.empty() || !exchange_code.empty() || !client_id.empty() || !device_code.empty();
 			}
 
 			static bool from(const nlohmann::json& in, Credentials& out);
@@ -240,6 +246,7 @@ namespace platanium {
 				bool refresh() override;
 			};
 
+			bool is_account_valid(void);
 			std::shared_ptr<Account> get_current_account(void);
 			void set_current_account(std::shared_ptr<Account> account);
 		}
@@ -307,6 +314,15 @@ namespace platanium {
 			public:
 				EpicExchangeCodeAuthManager() : EpicAuthManager("EpicExchangeCodeAuthManager") {
 					this->m_type = platanium::EPIC_EXCHANGE_CODE;
+				};
+
+				std::shared_ptr<platanium::authentification::account::Account> login(const Credentials& creds) override;
+			};
+
+			class EpicDeviceCodeAuthManager : public EpicAuthManager {
+			public:
+				EpicDeviceCodeAuthManager() : EpicAuthManager("EpicExchangeCodeAuthManager") {
+					this->m_type = platanium::EPIC_DEVICE_CODE;
 				};
 
 				std::shared_ptr<platanium::authentification::account::Account> login(const Credentials& creds) override;
@@ -386,13 +402,15 @@ namespace platanium {
 				constexpr const char* TOKEN = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token";
 				constexpr const char* EXCHANGE = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/exchange";
 				constexpr const char* RACP = "https://caldera-service-prod.ecosec.on.epicgames.com/caldera/api/v1/launcher/racp";
+				constexpr const char* CREATE_DEVICE_CODE = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/deviceAuthorization";
 			}
 
 			namespace auth_clients {
-				constexpr std::pair<const char*, const char*> fortniteIOSGameClient = std::make_pair("3446cd72694c4a4485d81b77adbb2141", "9209d4a5e25a457fb9b07489d313b41a");
-				constexpr std::pair<const char*, const char*> launcherAppClient2 = std::make_pair("34a02cf8f4414e29b15921876da36f9a", "daafbccc737745039dffe53d94fc76cf");
+				constexpr AuthClient fortniteIOSGameClient = std::make_pair("3446cd72694c4a4485d81b77adbb2141", "9209d4a5e25a457fb9b07489d313b41a");
+				constexpr AuthClient launcherAppClient2 = std::make_pair("34a02cf8f4414e29b15921876da36f9a", "daafbccc737745039dffe53d94fc76cf");
+				constexpr AuthClient fortniteNewSwitchGameClient = std::make_pair("98f7e42c2e3a4f86a74eb43fbb41ed39", "0a2449a2-001a-451e-afec-3e812901c4d7");
 
-				inline std::string build(std::pair<const char*, const char*> code)
+				inline std::string build(AuthClient code)
 				{
 					return base64_encode(std::string(code.first) + ":" + std::string(code.second));
 				}
@@ -406,13 +424,39 @@ namespace platanium {
 
 			namespace account {
 				namespace authentfication {
+					struct DeviceCode {
+						std::string user_code;
+						std::string device_code;
+						std::string client_id;
+					};
+
+					struct ClientCredentials {
+						std::string user_code;
+						std::string device_code;
+						std::string verification_uri_complete;
+						std::chrono::system_clock::time_point expires_at;
+
+						inline bool is_expired() const {
+							return std::chrono::system_clock::now() > expires_at;
+						}
+					};
+
 					static std::map<TOKEN_METHOD, std::pair<std::string, std::string>> token_to_body = {
 						{EPIC_AUTHORIZATION_CODE, std::make_pair("authorization_code", "code")},
 						{EPIC_REFRESH_TOKEN, std::make_pair("refresh_token", "refresh_token")},
-						{EPIC_EXCHANGE_CODE, std::make_pair("exchange_code", "exchange_code")}
+						{EPIC_EXCHANGE_CODE, std::make_pair("exchange_code", "exchange_code")},
+						{EPIC_DEVICE_CODE, std::make_pair("device_code", "device_code")},
 					};
 
-					platanium::authentification::account::AccountDescriptor token(const std::string token, const std::pair<const char*, const char*> client, TOKEN_METHOD token_type);
+					std::optional<platanium::epic::api::account::authentfication::DeviceCode> get_device_code(void);
+
+					//returns a token for client_credentials
+					const std::optional<std::string> client_credentials(const AuthClient client);
+
+					//creates a device code for authentification
+					const std::optional<ClientCredentials> create_device_code(void);
+
+					platanium::authentification::account::AccountDescriptor token(const std::string token, const AuthClient client, TOKEN_METHOD token_type);
 					const std::string exchange(const std::string& access_token);
 				}
 			}

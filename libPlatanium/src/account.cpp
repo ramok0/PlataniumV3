@@ -34,8 +34,14 @@ nlohmann::json platanium::authentification::account::Details::to_json(void)
 	return data;
 }
 
+bool platanium::authentification::account::is_account_valid(void)
+{
+	if (!platanium::currentAccount) return false;
+	return platanium::currentAccount->is_valid();
+}
+
 std::shared_ptr<Account> platanium::authentification::account::get_current_account(void) {
-	if (!platanium::currentAccount->is_valid()) throw std::runtime_error("Invalid account");
+	if (!platanium::authentification::account::is_account_valid()) throw std::runtime_error("Invalid account");
 	return platanium::currentAccount;
 }
 

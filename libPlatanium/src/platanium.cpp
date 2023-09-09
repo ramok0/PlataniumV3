@@ -61,9 +61,11 @@ bool platanium::initialize(void)
 
 	platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicAuthorizationCodeAuthManager>());
 	platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicRefreshTokenAuthManager>());
+	platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicDeviceCodeAuthManager>());
 
 	platanium::auth_clients.push_back(platanium::epic::api::auth_clients::fortniteIOSGameClient);
 	platanium::auth_clients.push_back(platanium::epic::api::auth_clients::launcherAppClient2);
+	platanium::auth_clients.push_back(platanium::epic::api::auth_clients::fortniteNewSwitchGameClient);
 
 	platanium::configuration = std::make_unique<Configuration>(std::filesystem::current_path() / "config.json");
 

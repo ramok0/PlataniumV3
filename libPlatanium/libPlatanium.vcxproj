@@ -33,6 +33,7 @@
     <ClCompile Include="src\authentification.cpp" />
     <ClCompile Include="src\epicauthmanager.cpp" />
     <ClCompile Include="src\epicauthorizationcode.cpp" />
+    <ClCompile Include="src\epicdevicecode.cpp" />
     <ClCompile Include="src\epicexchangecode.cpp" />
     <ClCompile Include="src\epicrefreshtoken.cpp" />
     <ClCompile Include="src\fortnite.cpp" />
