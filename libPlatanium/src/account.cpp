@@ -50,23 +50,29 @@ void platanium::authentification::account::set_current_account(std::shared_ptr<A
 }
 
 bool Account::save() {
-	if (this->get_descriptor().unique_authorization == false)
-	{
-		error::set_last_error(error::DOES_NOT_SUPPORT_SAVING);
-		return false;
-	}
+	//if (this->get_descriptor().unique_authorization == false)
+	//{
+	//	if (!this->refresh()) return false;
+	//}
 
-	std::string display_name = this->m_descriptor.details.display_name;
+	platanium::authentification::Credentials credentials;
+	credentials.type = EPIC_DEVICE_AUTH;
+	credentials.client_id = this->get_client_id();
+
+
+	if (!this->create_device_auth(credentials)) return false;
+
+	std::string display_name = platanium::currentAccount->m_descriptor.details.display_name;
 	auto it = std::find_if(platanium::accounts.begin(), platanium::accounts.end(), [&display_name](std::pair<std::string, platanium::authentification::Credentials> credentials) {
 		return credentials.first == display_name;
 		});
 
 	if (it == platanium::accounts.end())
 	{
-		platanium::accounts.push_back(std::make_pair(this->m_descriptor.details.display_name, this->get_refresh_token()));
+		platanium::accounts.push_back(std::make_pair(platanium::currentAccount->m_descriptor.details.display_name, credentials));
 	}
 	else {
-		it->second = this->get_refresh_token();
+		it->second = platanium::currentAccount->get_refresh_token();
 	}
 
 	return true;

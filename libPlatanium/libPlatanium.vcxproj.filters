@@ -95,5 +95,8 @@
     <ClCompile Include="src\epicdevicecode.cpp">
       <Filter>Fichiers sources\authmanagers</Filter>
     </ClCompile>
+    <ClCompile Include="src\epicdeviceauth.cpp">
+      <Filter>Fichiers sources\authmanagers</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

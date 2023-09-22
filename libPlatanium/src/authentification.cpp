@@ -5,46 +5,53 @@ using namespace platanium::authentification::account;
 
 
 
-AccountDescriptor account::authentfication::token(const std::string token, const std::pair<const char*, const char*> client, TOKEN_METHOD token_type)
+std::optional<AccountDescriptor> account::authentfication::token(const platanium::authentification::Credentials& creds, const std::string& body)
 {
+	auto it = std::find_if(platanium::auth_clients.begin(), platanium::auth_clients.end(), [&creds](platanium::AuthClient& client) {
+		return creds.client_id == client.first;
+		});
+	
+	if (it == platanium::auth_clients.end()) {
+		return std::nullopt;
+	}
+
 	AccountDescriptor result;
 	std::stringstream authorization_value;
-	authorization_value << "Basic " << auth_clients::build(client);
+	authorization_value << "Basic " << auth_clients::build(*it);
 
 	platanium::HeaderContainer headers;
 	headers.push_back({ "Content-Type", "application/x-www-form-urlencoded" });
 	headers.push_back({ "Authorization", authorization_value.str() });
 
-	std::stringstream body_stream;
 
-	std::string grant_type = token_to_body[token_type].first;
-	std::string code_property_name = token_to_body[token_type].second;
-	body_stream << "grant_type=" << grant_type << "&" << code_property_name << "=" << token;
+	//std::string grant_type = token_to_body[creds.type].first;
+	//std::string code_property_name = token_to_body[creds.type].second;
+	//body_stream << "grant_type=" << grant_type << "&" << code_property_name << "=" << token;
 
-	cpr::Response response = api::request(endpoints::TOKEN, headers, POST, body_stream.str());
+	cpr::Response response = api::request(endpoints::TOKEN, headers, POST, body);
 	
 	if (response.status_code != 200) {
 		spdlog::error("API Response : {} {}", response.status_code, response.text);
 		error::set_last_error(error::INVALID_API_RESPONSE);
-		return result;
+		return std::nullopt;
 	}
-	spdlog::debug("API response : {}", response.text);
+	//spdlog::debug("API response : {}", response.text);
 
 	nlohmann::json doc = nlohmann::json::parse(response.text);
 
 
 	if (!Details::from(doc, result.details)) {
 		spdlog::warn("failed to parse details");
-		return result;
+		return std::nullopt;
 	}
 	
-	result.client_id = client.first;
-	result.method = token_type;
+	result.client_id = creds.client_id;
+	result.method = creds.type;
 
 	return result;
 }
 
-const std::optional<platanium::epic::api::account::authentfication::ClientCredentials> platanium::epic::api::account::authentfication::create_device_code(void) {
+const std::optional<platanium::epic::api::account::authentfication::DeviceCode> platanium::epic::api::account::authentfication::create_device_code(void) {
 	const std::optional<std::string> client_creds = client_credentials(platanium::epic::api::auth_clients::fortniteNewSwitchGameClient);
 
 	if (!client_creds) return std::nullopt;
@@ -64,7 +71,7 @@ const std::optional<platanium::epic::api::account::authentfication::ClientCreden
 
 	nlohmann::json doc = nlohmann::json::parse(response.text);
 
-	platanium::epic::api::account::authentfication::ClientCredentials result;
+	platanium::epic::api::account::authentfication::DeviceCode result;
 
 	int expires_in;
 
@@ -136,11 +143,3 @@ const std::string platanium::epic::api::account::authentfication::exchange(const
 	return result;
 }
 
-std::optional<platanium::epic::api::account::authentfication::DeviceCode> platanium::epic::api::account::authentfication::get_device_code(void)
-{
-	platanium::HeaderContainer headers;
-	headers.push_back({ "Content-Type", "application/x-www-form-urlencoded" });
-	//headers.insert();
-
-	cpr::Response response = api::request(endpoints::CREATE_DEVICE_CODE, headers, METHOD::POST, "prompt=login");
-}

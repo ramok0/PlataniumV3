@@ -12,7 +12,7 @@ cpr::Response platanium::epic::api::request(const std::string uri, HeaderContain
 	cpr::Response response;
 	cpr::Body req_body;
 
-	if (method != METHOD::GET)
+	if (method != METHOD::GET && body.size() != 0)
 	{
 		req_body = cpr::Body(body);
 	}

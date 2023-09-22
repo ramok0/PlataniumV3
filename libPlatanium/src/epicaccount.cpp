@@ -15,6 +15,32 @@ const std::string platanium::authentification::account::EpicGamesAccount::get_ex
 	return epic::api::account::authentfication::exchange(this->get_details().access_token);
 }
 
+bool platanium::authentification::account::EpicGamesAccount::create_device_auth(Credentials& out)
+{
+	if (!platanium::exchange_to(platanium::epic::api::auth_clients::fortniteIOSGameClient)) return false;
+
+	out.client_id = platanium::authentification::account::get_current_account()->get_client_id();
+	out.type = EPIC_DEVICE_AUTH;
+
+	std::string url = platanium::epic::api::endpoints::create_device_auth();
+
+	platanium::HeaderContainer headers;
+	headers.push_back({ "Content-Type", "application/json" });
+	headers.push_back({ "Authorization", "bearer " + platanium::authentification::account::get_current_account()->get_details().access_token });
+
+	cpr::Response response = platanium::epic::api::request(url, headers, platanium::epic::api::METHOD::POST, "{}");
+
+//	spdlog::debug("Device Auth response => {}", response.text);
+
+	if (response.status_code != 200) return false;
+
+	nlohmann::json data = nlohmann::json::parse(response.text);
+
+	if (!Credentials::from(data, out)) return false;
+
+	return true;
+}
+
 const platanium::authentification::Credentials platanium::authentification::account::EpicGamesAccount::get_refresh_token()
 {
 	Credentials data;
@@ -31,21 +57,9 @@ platanium::ArgumentContainer platanium::authentification::account::EpicGamesAcco
 	spdlog::info("Getting authentification arguments");
 
 	//switch from current client id (this->m_client_id) to launcher token
-	std::string exchange_code;
-	if (this->get_client_id() == epic::api::auth_clients::launcherAppClient2.first)
-	{
-		exchange_code = this->get_exchange_code();
-	}
-	else {
-		const std::string current_exchange_code = this->get_exchange_code();
-		const AccountDescriptor details = epic::api::account::authentfication::token(current_exchange_code, epic::api::auth_clients::launcherAppClient2, EPIC_EXCHANGE_CODE);
+	platanium::exchange_to(platanium::epic::api::auth_clients::launcherAppClient2);
 
-		EpicGamesAccount* account = new EpicGamesAccount(details);
-
-		exchange_code = account->get_exchange_code();
-
-		delete account;
-	}
+	std::string exchange_code = this->get_exchange_code();
 
 	const EpicGamesAccount::Caldera caldera = this->request_anti_cheat_provider();
 
@@ -82,6 +96,6 @@ const EpicGamesAccount::Caldera EpicGamesAccount::Caldera::from(const nlohmann::
 	if (!extract_success) return out; //null opt
 
 	out.provider = provider_translator[raw_provider];
-	
+
 	return out;
 }

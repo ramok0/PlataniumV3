@@ -1,6 +1,31 @@
 #include <platanium.hpp>
 #include <tlhelp32.h>
 
+bool platanium::exchange_to(const platanium::AuthClient auth_client)
+{
+	using namespace platanium::authentification;
+
+	//exchange code does not exists on other auth managers
+	if (!account::get_current_account()->get_descriptor().is_epic) return false;
+
+	if (account::get_current_account()->get_client_id() == auth_client.first) return true;
+
+	//cast current account to EpicGamesAccount
+	account::EpicGamesAccount* account = (account::EpicGamesAccount*)account::get_current_account().get();
+
+	std::string exchange_code = account->get_exchange_code();
+
+	if (exchange_code.size() == 0) return false;
+
+	platanium::authentification::Credentials credentials;
+	credentials.exchange_code = exchange_code;
+	credentials.client_id = auth_client.first;
+	credentials.type = EPIC_EXCHANGE_CODE;
+
+	return platanium::login(credentials);
+}
+
+
 bool platanium::login(const platanium::authentification::Credentials credentials)
 {
 	std::shared_ptr<platanium::authentification::managers::BaseAuthManager> auth_manager = platanium::get_auth_manager(credentials.type);
@@ -63,6 +88,7 @@ bool platanium::initialize(void)
 	platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicRefreshTokenAuthManager>());
 	platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicExchangeCodeAuthManager>());
 	platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicDeviceCodeAuthManager>());
+	platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicDeviceAuthAuthManager>());
 
 	platanium::auth_clients.push_back(platanium::epic::api::auth_clients::fortniteIOSGameClient);
 	platanium::auth_clients.push_back(platanium::epic::api::auth_clients::launcherAppClient2);
