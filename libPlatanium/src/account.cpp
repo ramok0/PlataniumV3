@@ -3,19 +3,19 @@ using namespace platanium::authentification::account;
 
 bool Details::from(const nlohmann::json& doc, Details& out)
 {
-	if (json::json_exists(doc, "displayName")) {
-		json::extract_json(doc, "displayName", &out.display_name);
+	if (json::json_exists(doc, xorstr_("displayName"))) {
+		json::extract_json(doc, xorstr_("displayName"), &out.display_name);
 	}
 	
 	
-	if (json::json_exists(doc, "display_name"))
+	if (json::json_exists(doc, xorstr_("display_name")))
 	{
-		json::extract_json(doc, "display_name", &out.display_name);
+		json::extract_json(doc, xorstr_("display_name"), &out.display_name);
 	}
 
-	if (!json::extract_json(doc, "access_token", &out.access_token) ||
-	!json::extract_json(doc, "refresh_token", &out.refresh_token) ||
-		!json::extract_json(doc, "account_id", &out.account_id)) {
+	if (!json::extract_json(doc, xorstr_("access_token"), &out.access_token) ||
+	!json::extract_json(doc, xorstr_("refresh_token"), &out.refresh_token) ||
+		!json::extract_json(doc, xorstr_("account_id"), &out.account_id)) {
 		error::set_last_error(error::MISSING_ENTRY);
 		return false;
 	}
@@ -26,9 +26,9 @@ bool Details::from(const nlohmann::json& doc, Details& out)
 nlohmann::json platanium::authentification::account::Details::to_json(void)
 {
 	nlohmann::json data = {
-		{"account_id", this->account_id},
-		{"display_name", this->display_name},
-		{"refresh_token", this->refresh_token},
+		{xorstr_("account_id"), this->account_id},
+		{xorstr_("display_name"), this->display_name},
+		{xorstr_("refresh_token"), this->refresh_token},
 	};
 
 	return data;
@@ -41,7 +41,7 @@ bool platanium::authentification::account::is_account_valid(void)
 }
 
 std::shared_ptr<Account> platanium::authentification::account::get_current_account(void) {
-	if (!platanium::authentification::account::is_account_valid()) throw std::runtime_error("Invalid account");
+	if (!platanium::authentification::account::is_account_valid()) throw std::runtime_error(xorstr_("Invalid account"));
 	return platanium::currentAccount;
 }
 

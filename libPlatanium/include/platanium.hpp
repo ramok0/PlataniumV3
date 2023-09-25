@@ -9,6 +9,7 @@
 #include <cpr/cpr.h>
 #include <winternl.h>
 #include <base64/base64.hpp>
+#include <xorstr.hpp>
 
 #pragma comment(lib, "Version.lib")
 #pragma comment(lib, "Ws2_32.lib")
@@ -203,16 +204,16 @@ namespace platanium {
 				//array<header name, header value>
 				virtual const platanium::HeaderContainer get_authentification_headers() {
 					return {
-						std::make_pair("Authorization", "Bearer " + this->m_details.access_token)
+						std::make_pair(xorstr_("Authorization"), xorstr_("Bearer ") + this->m_details.access_token)
 					};
 				}
 
 				virtual bool create_device_auth(Credentials& out) {
-					throw std::logic_error("Not implemented");
+					throw std::logic_error(xorstr_("Not implemented"));
 				};
 
 				virtual bool refresh() {
-					spdlog::warn("You are calling BaseClass");
+					spdlog::warn(xorstr_("You are calling BaseClass"));
 					return false;
 				}
 
@@ -294,11 +295,11 @@ namespace platanium {
 				}
 
 				virtual bool is_official() {
-					return this->m_name.contains("Epic");
+					return this->m_name.contains(xorstr_("Epic"));
 				}
 
 				virtual std::shared_ptr<platanium::authentification::account::Account> login(const Credentials& creds) {
-					throw std::runtime_error("login not implemented for this auth manager");
+					throw std::runtime_error(xorstr_("login not implemented for this auth manager"));
 				}
 
 				const std::string get_name() {
@@ -329,20 +330,20 @@ namespace platanium {
 
 			class EpicAuthorizationCodeAuthManager : public EpicAuthManager {
 			public:
-				EpicAuthorizationCodeAuthManager() : EpicAuthManager("EpicAuthorizationCodeAuthManager") {
+				EpicAuthorizationCodeAuthManager() : EpicAuthManager(xorstr_("EpicAuthorizationCodeAuthManager")) {
 					this->m_type = platanium::EPIC_AUTHORIZATION_CODE;
 				};
 
 				std::shared_ptr<platanium::authentification::account::Account> login(const Credentials& creds) override;
 
 				const std::string get_token_body(const Credentials& data) override {
-					return "grant_type=authorization_code&code=" + data.authorization_code;
+					return xorstr_("grant_type=authorization_code&code=") + data.authorization_code;
 				}
 			};
 
 			class EpicRefreshTokenAuthManager : public EpicAuthManager {
 			public:
-				EpicRefreshTokenAuthManager() : EpicAuthManager("EpicRefreshTokenAuthManager") {
+				EpicRefreshTokenAuthManager() : EpicAuthManager(xorstr_("EpicRefreshTokenAuthManager")) {
 					this->m_type = platanium::EPIC_REFRESH_TOKEN;
 					this->bSupportsMultipleConnections = true;
 				};
@@ -350,46 +351,46 @@ namespace platanium {
 				std::shared_ptr<platanium::authentification::account::Account> login(const Credentials& creds) override;
 
 				const std::string get_token_body(const Credentials& data) override {
-					return "grant_type=refresh_token&refresh_token=" + data.refresh_token;
+					return xorstr_("grant_type=refresh_token&refresh_token=") + data.refresh_token;
 				}
 			};		
 			
 			class EpicExchangeCodeAuthManager : public EpicAuthManager {
 			public:
-				EpicExchangeCodeAuthManager() : EpicAuthManager("EpicExchangeCodeAuthManager") {
+				EpicExchangeCodeAuthManager() : EpicAuthManager(xorstr_("EpicExchangeCodeAuthManager")) {
 					this->m_type = platanium::EPIC_EXCHANGE_CODE;
 				};
 
 				std::shared_ptr<platanium::authentification::account::Account> login(const Credentials& creds) override;
 
 				const std::string get_token_body(const Credentials& data) override {
-					return "grant_type=exchange_code&exchange_code=" + data.exchange_code;
+					return xorstr_("grant_type=exchange_code&exchange_code=") + data.exchange_code;
 				}
 			};
 
 			class EpicDeviceCodeAuthManager : public EpicAuthManager {
 			public:
-				EpicDeviceCodeAuthManager() : EpicAuthManager("EpicDeviceCodeAuthManager") {
+				EpicDeviceCodeAuthManager() : EpicAuthManager(xorstr_("EpicDeviceCodeAuthManager")) {
 					this->m_type = platanium::EPIC_DEVICE_CODE;
 				};
 
 				std::shared_ptr<platanium::authentification::account::Account> login(const Credentials& creds) override;
 
 				const std::string get_token_body(const Credentials& data) override {
-					return "grant_type=device_code&device_code=" + data.device_code;
+					return xorstr_("grant_type=device_code&device_code=") + data.device_code;
 				}
 			};		
 			
 			class EpicDeviceAuthAuthManager : public EpicAuthManager {
 			public:
-				EpicDeviceAuthAuthManager() : EpicAuthManager("EpicDeviceAuthAuthManager") {
+				EpicDeviceAuthAuthManager() : EpicAuthManager(xorstr_("EpicDeviceAuthAuthManager")) {
 					this->m_type = platanium::EPIC_DEVICE_AUTH;
 				};
 
 				std::shared_ptr<platanium::authentification::account::Account> login(const Credentials& creds) override;
 
 				const std::string get_token_body(const Credentials& data) override {
-					return "grant_type=device_auth&account_id=" + data.accountId + "&device_id=" + data.deviceId + "&secret=" + data.secret;
+					return xorstr_("grant_type=device_auth&account_id=") + data.accountId + xorstr_("&device_id=") + data.deviceId + xorstr_("&secret=") + data.secret;
 				}
 			};
 		}
@@ -413,10 +414,10 @@ namespace platanium {
 			bool load_success = this->exists() ? this->load() : this->load_default();
 
 			if (!load_success) {
-				throw std::runtime_error("failed to load configuration");
+				throw std::runtime_error(xorstr_("failed to load configuration"));
 			}
 
-			spdlog::info("Configuration is loaded successfully");
+			spdlog::info(xorstr_("Configuration is loaded successfully"));
 		}
 
 		~Configuration() {
@@ -424,7 +425,7 @@ namespace platanium {
 				delete this->data;
 			}
 
-			spdlog::info("Configuration has been destroyed successfully");
+			spdlog::info(xorstr_("Configuration has been destroyed successfully"));
 		}
 
 		Data* get() {
@@ -473,15 +474,15 @@ namespace platanium {
 			}
 
 			namespace endpoints {
-				const std::string TOKEN = services::ACCOUNT + "/oauth/token";
-				const std::string EXCHANGE = services::ACCOUNT + "/oauth/exchange";
-				const std::string RACP = services::CALDERA + "/v1/launcher/racp";
-				const std::string CREATE_DEVICE_CODE = services::ACCOUNT + "/oauth/deviceAuthorization";
+				const std::string TOKEN = services::ACCOUNT + xorstr_("/oauth/token");
+				const std::string EXCHANGE = services::ACCOUNT + xorstr_("/oauth/exchange");
+				const std::string RACP = services::CALDERA + xorstr_("/v1/launcher/racp");
+				const std::string CREATE_DEVICE_CODE = services::ACCOUNT + xorstr_("/oauth/deviceAuthorization");
 
 				inline const std::string create_device_auth() {
 					std::string account_id = platanium::authentification::account::get_current_account()->get_details().account_id;
 
-					return services::ACCOUNT + "/public/account/" + account_id + "/deviceAuth";
+					return services::ACCOUNT + xorstr_("/public/account/") + account_id + xorstr_("/deviceAuth");
 				}
 			}
 
@@ -518,10 +519,10 @@ namespace platanium {
 					};
 
 					static std::map<TOKEN_METHOD, std::pair<std::string, std::string>> token_to_body = {
-						{EPIC_AUTHORIZATION_CODE, std::make_pair("authorization_code", "code")},
-						{EPIC_REFRESH_TOKEN, std::make_pair("refresh_token", "refresh_token")},
-						{EPIC_EXCHANGE_CODE, std::make_pair("exchange_code", "exchange_code")},
-						{EPIC_DEVICE_CODE, std::make_pair("device_code", "device_code")},
+						{EPIC_AUTHORIZATION_CODE, std::make_pair(xorstr_("authorization_code"), xorstr_("code"))},
+						{EPIC_REFRESH_TOKEN, std::make_pair(xorstr_("refresh_token"), xorstr_("refresh_token"))},
+						{EPIC_EXCHANGE_CODE, std::make_pair(xorstr_("exchange_code"), xorstr_("exchange_code"))},
+						{EPIC_DEVICE_CODE, std::make_pair(xorstr_("device_code"), xorstr_("device_code"))},
 					};
 
 					std::optional<platanium::epic::api::account::authentfication::DeviceCode> get_device_code(void);
@@ -560,7 +561,7 @@ namespace platanium {
 			LauncherInstalled() {
 				if (!this->parse())
 				{
-					spdlog::warn("Platanium wont be able to find Fortnite installation automaticly.");
+					spdlog::warn(xorstr_("Platanium wont be able to find Fortnite installation automaticly."));
 				}
 			}
 
@@ -576,7 +577,7 @@ namespace platanium {
 
 			bool find(LauncherInstalledEntry& out, std::function<bool(const LauncherInstalledEntry&)> prediction);
 
-			std::filesystem::path m_path = std::filesystem::path("C:\\ProgramData\\Epic\\UnrealEngineLauncher\\LauncherInstalled.dat");
+			std::filesystem::path m_path = std::filesystem::path(xorstr_("C:\\ProgramData\\Epic\\UnrealEngineLauncher\\LauncherInstalled.dat"));
 			std::vector<LauncherInstalledEntry> m_data;
 		};
 
@@ -593,7 +594,7 @@ namespace platanium {
 			~FortniteHandle() {
 				if (this->is_alive())
 				{
-					spdlog::info("Closing Fortnite because FortniteHandle destructor has been called");
+					spdlog::info(xorstr_("Closing Fortnite because FortniteHandle destructor has been called"));
 					this->kill();
 				}
 
@@ -641,7 +642,7 @@ namespace platanium {
 
 			inline std::filesystem::path get_binary_path(void)
 			{
-				return this->m_fortnite_path / "FortniteGame" / "Binaries" / "Win64" / "FortniteClient-Win64-Shipping.exe";
+				return this->m_fortnite_path / xorstr_("FortniteGame") / xorstr_("Binaries") / xorstr_("Win64") / xorstr_("FortniteClient-Win64-Shipping.exe");
 			}
 
 			bool exists(void);

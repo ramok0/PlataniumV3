@@ -79,12 +79,12 @@ bool platanium::initialize(platanium::CLIENT_TYPE client_type)
 
 	if (platanium::is_launcher())
 	{
-		platanium::configuration = std::make_unique<Configuration>(std::filesystem::current_path() / "config.json");
+		platanium::configuration = std::make_unique<Configuration>(std::filesystem::current_path() / xorstr_("config.json"));
 	}
 	else if (platanium::is_dll()) {
 		char* data = GetCommandLineA();
 
-		std::regex pattern(R"(-plataniumconfigpath=\"([^\"]+)\")");
+		std::regex pattern(xorstr_(R"(-plataniumconfigpath=\"([^\"]+)\")"));
 		std::smatch match;
 		std::string sData = std::string(data);
 
@@ -104,7 +104,7 @@ bool platanium::initialize(platanium::CLIENT_TYPE client_type)
 
 	platanium::authentification::account::set_current_account(nullptr);
 
-	spdlog::info("libPlatanium is initialized successfully");
+	spdlog::info(xorstr_("libPlatanium is initialized successfully"));
 	return true;
 }
 
@@ -122,7 +122,7 @@ bool platanium::destroy(void)
 		platanium::currentAccount = nullptr;
 	}
 
-	spdlog::info("libPlatanium has been destroyed successfully");
+	spdlog::info(xorstr_("libPlatanium has been destroyed successfully"));
 
 	return true;
 }

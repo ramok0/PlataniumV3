@@ -56,12 +56,12 @@ bool platanium::Configuration::write()
 	Data* data = this->get();
 
 	nlohmann::json doc;
-	doc["url"] = data->url;
-	doc["proxy"] = data->proxy;
-	doc["bRedirectTraffic"] = data->bRedirectTraffic;
-	doc["bUseProxy"] = data->bUseProxy;
-	doc["port"] = data->port;
-	doc["fortnite_path"] = data->fortnite_path;
+	doc[xorstr_("url")] = data->url;
+	doc[xorstr_("proxy")] = data->proxy;
+	doc[xorstr_("bRedirectTraffic")] = data->bRedirectTraffic;
+	doc[xorstr_("bUseProxy")] = data->bUseProxy;
+	doc[xorstr_("port")] = data->port;
+	doc[xorstr_("fortnite_path")] = data->fortnite_path;
 	
 	nlohmann::json accounts = nlohmann::json::array();
 
@@ -71,16 +71,16 @@ bool platanium::Configuration::write()
 
 		std::string out;
 		if (!account.second.cipher(out)) {
-			spdlog::error("Failed to cipher account credentials");
+			spdlog::error(xorstr_("Failed to cipher account credentials"));
 			continue;
 		}
 
 
-		accounts[i]["display_name"] = account.first;
-		accounts[i]["secret"] = out;
+		accounts[i][xorstr_("display_name")] = account.first;
+		accounts[i][xorstr_("secret")] = out;
 	}
 
-	doc["accounts_ciphered"] = accounts;
+	doc[xorstr_("accounts_ciphered")] = accounts;
 
 	spdlog::debug("writing configuration to {}", this->m_config_path.string());
 
@@ -107,7 +107,7 @@ bool platanium::Configuration::read(std::string& out)
 	if (!stream.is_open())
 	{
 		set_last_error(platanium::error::FAILED_TO_READ_FILE);
-		spdlog::error("failed to read configuration");
+		spdlog::error(xorstr_("failed to read configuration"));
 		return false;
 	}
 
@@ -127,11 +127,11 @@ bool platanium::Configuration::parse(const std::string& str)
 	nlohmann::json doc;
 	try {
 		doc = nlohmann::json::parse(str);
-		spdlog::info("parsed configuration successfully");
+		spdlog::info(xorstr_("parsed configuration successfully"));
 	}
 	catch (const nlohmann::json::parse_error&) {
 		set_last_error(platanium::error::JSON_PARSING_ERROR);
-		spdlog::error("failed to json parse configuration");
+		spdlog::error(xorstr_("failed to json parse configuration"));
 		return false;
 	}
 
@@ -140,23 +140,23 @@ bool platanium::Configuration::parse(const std::string& str)
 
 bool platanium::Configuration::extract_fields(const nlohmann::json& doc)
 {
-	if (!json::extract_json(doc, "url", &this->data->url)
-		|| !json::extract_json(doc, "proxy", &this->data->proxy)
-		|| !json::extract_json(doc, "bRedirectTraffic", &this->data->bRedirectTraffic)
-		|| !json::extract_json(doc, "bUseProxy", &this->data->bUseProxy)
-		|| !json::extract_json(doc, "fortnite_path", &this->data->fortnite_path)
-		|| !json::extract_json(doc, "port", &this->data->port))
+	if (!json::extract_json(doc, xorstr_("url"), &this->data->url)
+		|| !json::extract_json(doc, xorstr_("proxy"), &this->data->proxy)
+		|| !json::extract_json(doc, xorstr_("bRedirectTraffic"), &this->data->bRedirectTraffic)
+		|| !json::extract_json(doc, xorstr_("bUseProxy"), &this->data->bUseProxy)
+		|| !json::extract_json(doc, xorstr_("fortnite_path"), &this->data->fortnite_path)
+		|| !json::extract_json(doc, xorstr_("port"), &this->data->port))
 	{
 		set_last_error(platanium::error::MISSING_ENTRY);
 		return false;
 	}
 
-	if (json::json_exists(doc, "accounts_ciphered"))
+	if (json::json_exists(doc, xorstr_("accounts_ciphered")))
 	{
-		for (nlohmann::json document : doc["accounts_ciphered"])
+		for (nlohmann::json document : doc[xorstr_("accounts_ciphered")])
 		{
-			std::string display_name = document["display_name"].get<std::string>();
-			std::string secret = document["secret"].get<std::string>();
+			std::string display_name = document[xorstr_("display_name")].get<std::string>();
+			std::string secret = document[xorstr_("secret")].get<std::string>();
 
 			platanium::authentification::Credentials credentials;
 			if(platanium::authentification::Credentials::uncipher(secret, credentials))

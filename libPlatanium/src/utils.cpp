@@ -4,7 +4,7 @@
 
 void platanium::epic::utils::kill_anticheats(void)
 {
-	static std::array<const wchar_t*, 5> kill_process = {L"EpicGamesLauncher.exe", L"FortniteLauncher.exe",L"FortniteClient-Win64-Shipping_EAC.exe", L"FortniteClient-Win64-Shipping_BE.exe", L"FortniteClient-Win64-Shipping_EAC_EOS.exe"};
+	static std::array<const wchar_t*, 5> kill_process = { xorstr_(L"EpicGamesLauncher.exe"), xorstr_(L"FortniteLauncher.exe"),xorstr_(L"FortniteClient-Win64-Shipping_EAC.exe"), xorstr_(L"FortniteClient-Win64-Shipping_BE.exe"), xorstr_(L"FortniteClient-Win64-Shipping_EAC_EOS.exe")};
 
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 

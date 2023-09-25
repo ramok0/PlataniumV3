@@ -25,10 +25,10 @@ bool platanium::authentification::account::EpicGamesAccount::create_device_auth(
 	std::string url = platanium::epic::api::endpoints::create_device_auth();
 
 	platanium::HeaderContainer headers;
-	headers.push_back({ "Content-Type", "application/json" });
-	headers.push_back({ "Authorization", "bearer " + platanium::authentification::account::get_current_account()->get_details().access_token });
+	headers.push_back({ xorstr_("Content-Type"), xorstr_("application/json") });
+	headers.push_back({ xorstr_("Authorization"), xorstr_("bearer ") + platanium::authentification::account::get_current_account()->get_details().access_token });
 
-	cpr::Response response = platanium::epic::api::request(url, headers, platanium::epic::api::METHOD::POST, "{}");
+	cpr::Response response = platanium::epic::api::request(url, headers, platanium::epic::api::METHOD::POST, xorstr_("{}"));
 
 //	spdlog::debug("Device Auth response => {}", response.text);
 
@@ -54,7 +54,7 @@ const platanium::authentification::Credentials platanium::authentification::acco
 
 platanium::ArgumentContainer platanium::authentification::account::EpicGamesAccount::get_authentification_arguments()
 {
-	spdlog::info("Getting authentification arguments");
+	spdlog::info(xorstr_("Getting authentification arguments"));
 
 	//switch from current client id (this->m_client_id) to launcher token
 	platanium::exchange_to(platanium::epic::api::auth_clients::launcherAppClient2);
@@ -64,12 +64,12 @@ platanium::ArgumentContainer platanium::authentification::account::EpicGamesAcco
 	const EpicGamesAccount::Caldera caldera = this->request_anti_cheat_provider();
 
 	platanium::ArgumentContainer arguments;
-	arguments.push_back(std::make_pair("AUTH_PASSWORD", exchange_code));
-	arguments.push_back(std::make_pair("epicusername", this->get_details().display_name));
-	arguments.push_back(std::make_pair("epicuserid", this->get_details().account_id));
-	arguments.push_back(std::make_pair("fromfl", caldera.provider));
-	arguments.push_back(std::make_pair("caldera", caldera.jwt));
-	arguments.push_back(std::make_pair("plataniumconfigpath", platanium::configuration->get_path().string()));
+	arguments.push_back(std::make_pair(xorstr_("AUTH_PASSWORD"), exchange_code));
+	arguments.push_back(std::make_pair(xorstr_("epicusername"), this->get_details().display_name));
+	arguments.push_back(std::make_pair(xorstr_("epicuserid"), this->get_details().account_id));
+	arguments.push_back(std::make_pair(xorstr_("fromfl"), caldera.provider));
+	arguments.push_back(std::make_pair(xorstr_("caldera"), caldera.jwt));
+	arguments.push_back(std::make_pair(xorstr_("plataniumconfigpath"), "\"" + platanium::configuration->get_path().string() + "\""));
 
 	return arguments;
 }
@@ -84,15 +84,15 @@ bool EpicGamesAccount::refresh()
 const EpicGamesAccount::Caldera EpicGamesAccount::Caldera::from(const nlohmann::json& doc)
 {
 	static std::map<std::string, std::string> provider_translator = {
-		{"EasyAntiCheat", "eac"},
-		{"EasyAntiCheatEOS", "eaceos"},
-		{"BattlEye", "be"}
+		{xorstr_("EasyAntiCheat"), xorstr_("eac")},
+		{xorstr_("EasyAntiCheatEOS"), xorstr_("eaceos")},
+		{xorstr_("BattlEye"), xorstr_("be")}
 	};
 	std::string raw_provider;
 
 	EpicGamesAccount::Caldera out;
 
-	bool extract_success = json::extract_json(doc, "jwt", &out.jwt) && json::extract_json(doc, "provider", &raw_provider);
+	bool extract_success = json::extract_json(doc, xorstr_("jwt"), &out.jwt) && json::extract_json(doc, xorstr_("provider"), &raw_provider);
 	if (!extract_success) return out; //null opt
 
 	out.provider = provider_translator[raw_provider];

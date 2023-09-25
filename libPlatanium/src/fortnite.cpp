@@ -3,21 +3,21 @@
 std::string platanium::epic::Fortnite::get_start_arguments(platanium::ArgumentContainer override_arguments)
 {
 	static std::array<std::pair<std::string, std::optional<std::string>>, 15> default_arguments {
-		std::make_pair("frombe", std::nullopt),
-		std::make_pair("EpicPortal", std::nullopt),
-		std::make_pair("AUTH_LOGIN", "unused"),
-		std::make_pair("AUTH_PASSWORD", std::nullopt),
-		std::make_pair("AUTH_TYPE", "exchangecode"),
-		std::make_pair("epicapp", "Fortnite"),
-		std::make_pair("epicenv", "Prod"),
-		std::make_pair("epicusername", std::nullopt),
-		std::make_pair("epicuserid", std::nullopt),
-		std::make_pair("noeac", std::nullopt),
-		std::make_pair("noeaceos", std::nullopt),
-		std::make_pair("fromfl", std::nullopt),
-		std::make_pair("caldera", std::nullopt),
-		std::make_pair("frombe", std::nullopt),
-		std::make_pair("plataniumconfigpath", std::nullopt),
+		std::make_pair(xorstr_("frombe"), std::nullopt),
+		std::make_pair(xorstr_("EpicPortal"), std::nullopt),
+		std::make_pair(xorstr_("AUTH_LOGIN"), "unused"),
+		std::make_pair(xorstr_("AUTH_PASSWORD"), std::nullopt),
+		std::make_pair(xorstr_("AUTH_TYPE"), "exchangecode"),
+		std::make_pair(xorstr_("epicapp"), "Fortnite"),
+		std::make_pair(xorstr_("epicenv"), "Prod"),
+		std::make_pair(xorstr_("epicusername"), std::nullopt),
+		std::make_pair(xorstr_("epicuserid"), std::nullopt),
+		std::make_pair(xorstr_("noeac"), std::nullopt),
+		std::make_pair(xorstr_("noeaceos"), std::nullopt),
+		std::make_pair(xorstr_("fromfl"), std::nullopt),
+		std::make_pair(xorstr_("caldera"), std::nullopt),
+		std::make_pair(xorstr_("frombe"), std::nullopt),
+		std::make_pair(xorstr_("plataniumconfigpath"), std::nullopt),
 	};
 
 	platanium::ArgumentContainer arguments;
@@ -40,9 +40,9 @@ std::string platanium::epic::Fortnite::get_start_arguments(platanium::ArgumentCo
 	std::ostringstream out;
 
 	for (const auto& argument : arguments) {
-		out << "-" << argument.first;
+		out << xorstr_("-") << argument.first;
 		if (argument.second.has_value()) {
-			out << "=" << argument.second.value();
+			out << xorstr_("=") << argument.second.value();
 		}
 		out << " ";
 	}
@@ -64,7 +64,7 @@ std::filesystem::path platanium::epic::Fortnite::find_path(void)
 
 bool platanium::epic::Fortnite::exists(void)
 {
-	return std::filesystem::exists(this->m_fortnite_path / "Engine") && std::filesystem::exists(this->m_fortnite_path / "FortniteGame") && std::filesystem::exists(this->get_binary_path());
+	return std::filesystem::exists(this->m_fortnite_path / xorstr_("Engine")) && std::filesystem::exists(this->m_fortnite_path / xorstr_("FortniteGame")) && std::filesystem::exists(this->get_binary_path());
 }
 
 float platanium::epic::Fortnite::get_engine_version(void)
@@ -75,14 +75,14 @@ float platanium::epic::Fortnite::get_engine_version(void)
 	DWORD dwSize = GetFileVersionInfoSizeA(this->m_fortnite_path.string().c_str(), &dwHandle);
 	if (dwSize == NULL)
 	{
-		spdlog::error("Failed to get Engine Version");
+		spdlog::error(xorstr_("Failed to get Engine Version"));
 		return 0.f;
 	}
 
 	std::vector<BYTE> buffer(dwSize);
 	if (!GetFileVersionInfoA(this->m_fortnite_path.string().c_str(), NULL, dwSize, buffer.data()))
 	{
-		spdlog::error("Failed to get Engine Version");
+		spdlog::error(xorstr_("Failed to get Engine Version"));
 		return 0.f;
 	}
 
@@ -90,7 +90,7 @@ float platanium::epic::Fortnite::get_engine_version(void)
 	UINT uLen;
 	if (!VerQueryValueA(buffer.data(), "\\", (LPVOID*)&pFileInfo, &uLen))
 	{
-		spdlog::error("Failed to get Engine Version");
+		spdlog::error(xorstr_("Failed to get Engine Version"));
 		return 0.f;
 	}
 
@@ -108,7 +108,7 @@ platanium::epic::FortniteHandle* platanium::epic::Fortnite::start(const std::str
 {
 	if (!this->exists())
 	{
-		spdlog::error("Failed to find game binary");
+		spdlog::error(xorstr_("Failed to find game binary"));
 		error::set_last_error(error::FAILED_TO_FIND_FILE);
 		return nullptr;
 	}
@@ -138,7 +138,7 @@ platanium::epic::FortniteHandle* platanium::epic::Fortnite::start(const std::str
 		return nullptr;
 	}
 
-	const std::array<std::string, 4> anti_cheats_paths = { "FortniteClient-Win64-Shipping_BE.exe", "FortniteClient-Win64-Shipping_EAC_EOS.exe", "FortniteClient-Win64-Shipping_EAC.exe", "FortniteLauncher.exe"};
+	const std::array<std::string, 4> anti_cheats_paths = { xorstr_("FortniteClient-Win64-Shipping_BE.exe"),xorstr_("FortniteClient-Win64-Shipping_EAC_EOS.exe"),xorstr_("FortniteClient-Win64-Shipping_EAC.exe"),xorstr_("FortniteLauncher.exe")};
 
 	for (auto& path : anti_cheats_paths)
 	{

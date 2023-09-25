@@ -5,16 +5,16 @@ platanium::epic::LauncherInstalled::LauncherInstalledEntry platanium::epic::Laun
 {
 	platanium::epic::LauncherInstalled::LauncherInstalledEntry out;
 
-	if (!json::extract_json(doc, "AppName", &out.AppName)
-		|| !json::extract_json(doc, "AppVersion", &out.AppVersion)
-		|| !json::extract_json(doc, "ArtifactId", &out.ArtifactId)
-		|| !json::extract_json(doc, "NamespaceId", &out.NamespaceId)
-		|| !json::extract_json(doc, "ItemId", &out.ItemId)
-		|| !json::extract_json(doc, "InstallLocation", &out.InstallLocation))
+	if (!json::extract_json(doc, xorstr_("AppName"), &out.AppName)
+		|| !json::extract_json(doc, xorstr_("AppVersion"), &out.AppVersion)
+		|| !json::extract_json(doc, xorstr_("ArtifactId"), &out.ArtifactId)
+		|| !json::extract_json(doc, xorstr_("NamespaceId"), &out.NamespaceId)
+		|| !json::extract_json(doc, xorstr_("ItemId"), &out.ItemId)
+		|| !json::extract_json(doc, xorstr_("InstallLocation"), &out.InstallLocation))
 	{
 		error::set_last_error(error::MISSING_ENTRY);
-		spdlog::error("An entry is missing from json to parse LauncherInstalledEntry");
-		throw std::runtime_error("JSON MISSING ENTRY");
+		spdlog::error(xorstr_("An entry is missing from json to parse LauncherInstalledEntry"));
+		throw std::runtime_error(xorstr_("JSON MISSING ENTRY"));
 	}
 
 	return out;
@@ -30,7 +30,7 @@ bool platanium::epic::LauncherInstalled::read(std::string& out)
 	if (!this->exists())
 	{
 		error::set_last_error(error::NO_EXISTS);
-		spdlog::error("failed to read LauncherInstalled.dat because the file does not exists");
+		spdlog::error(xorstr_("failed to read LauncherInstalled.dat because the file does not exists"));
 		return false;
 	}
 
@@ -39,7 +39,7 @@ bool platanium::epic::LauncherInstalled::read(std::string& out)
 	if (!stream.is_open())
 	{
 		error::set_last_error(error::FAILED_TO_READ_FILE);
-		spdlog::error("failed to read LauncherInstalled.dat");
+		spdlog::error(xorstr_("failed to read LauncherInstalled.dat"));
 		return false;
 	}
 
@@ -64,18 +64,18 @@ bool platanium::epic::LauncherInstalled::parse(void) {
 	}
 	catch (const nlohmann::json::parse_error&) {
 			set_last_error(platanium::error::JSON_PARSING_ERROR);
-			spdlog::error("failed to json parse launcherinstalled.dat");
+			//spdlog::error(xorstr_("failed to json parse launcherinstalled.dat"));
 			return false;
 	}
 
-	if (!json::json_exists(doc, "InstallationList"))
+	if (!json::json_exists(doc, xorstr_("InstallationList")))
 	{
 		set_last_error(platanium::error::MISSING_ENTRY);
 		spdlog::error("failed to find InstallationList");
 		return false;
 	}
 
-	for (auto& entry_json : doc["InstallationList"])
+	for (auto& entry_json : doc[xorstr_("InstallationList")])
 	{
 		auto entry = platanium::epic::LauncherInstalled::LauncherInstalledEntry::from(entry_json);
 
@@ -107,9 +107,9 @@ bool platanium::epic::LauncherInstalled::find_fortnite_path(std::filesystem::pat
 {
 	LauncherInstalled launcherInstalled;
 	LauncherInstalledEntry entry;
-	if (!launcherInstalled.find_by_app_name("Fortnite", entry))
+	if (!launcherInstalled.find_by_app_name(xorstr_("Fortnite"), entry))
 	{
-		spdlog::error("Failed to find fortnite installation path");
+		spdlog::error(xorstr_("Failed to find fortnite installation path"));
 		return false;
 	}
 

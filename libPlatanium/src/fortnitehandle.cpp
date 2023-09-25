@@ -26,7 +26,7 @@ bool platanium::epic::FortniteHandle::is_suspended(void)
 	status = windows::NtQueryStatusInformation(SystemProcessInformation, nullptr, 0, &returnLength);
 	if (status != STATUS_INFO_LENGTH_MISMATCH)
 	{
-		spdlog::error("NtQuerySystemInformation failed (1)");
+		spdlog::error(xorstr_("NtQuerySystemInformation failed (1)"));
 		return false;
 	}
 	
@@ -83,7 +83,7 @@ bool platanium::epic::FortniteHandle::suspend(void)
 
 bool platanium::epic::FortniteHandle::resume(void)
 {
-	spdlog::debug("trying to resume app..");
+	spdlog::debug(xorstr_("trying to resume app.."));
 	return NT_SUCCESS(windows::NtResumeProcess(this->get_process_info()->hProcess));
 }
 
@@ -101,24 +101,24 @@ bool platanium::epic::FortniteHandle::inject(std::filesystem::path dll_path)
 	const DWORD dwWriteResult = WriteProcessMemory(this->get_process_info()->hProcess, lpPathAddress, dll_path_string.c_str(), dll_path_size + 1, nullptr);
 	if (dwWriteResult == 0)
 	{
-		spdlog::error("Failed to write DLL Path");
+		spdlog::error(xorstr_("Failed to write DLL Path"));
 		//TODO : free memory
 		return false;
 	}
 
-	const HMODULE hModule = GetModuleHandleA("kernel32.dll");
-	const FARPROC lpFunctionAddress = GetProcAddress(hModule, "LoadLibraryA");
+	const HMODULE hModule = GetModuleHandleA(xorstr_("kernel32.dll"));
+	const FARPROC lpFunctionAddress = GetProcAddress(hModule, xorstr_("LoadLibraryA"));
 
 	const HANDLE hThreadCreationResult = CreateRemoteThread(this->get_process_info()->hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)lpFunctionAddress, lpPathAddress, 0, nullptr);
 	if (hThreadCreationResult == INVALID_HANDLE_VALUE)
 	{
-		spdlog::error("Failed to create Thread");
+		spdlog::error(xorstr_("Failed to create Thread"));
 		return false;
 	}
 
 	VirtualFreeEx(this->get_process_info()->hProcess, lpPathAddress, dll_path_size + 1, MEM_RELEASE);
 
-	spdlog::info("thread has been created");
+	spdlog::info(xorstr_("thread has been created"));
 
 	return true;
 }

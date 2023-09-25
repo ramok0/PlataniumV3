@@ -12,7 +12,7 @@ bool platanium::authentification::Credentials::from(const nlohmann::json& in, Cr
 		{
 			if (!json::extract_json(in, key, out))
 			{
-				spdlog::error("failed to parse credentials from json");
+				spdlog::error(xorstr_("failed to parse credentials from json"));
 				fail = true;
 				return false;
 			}
@@ -21,29 +21,29 @@ bool platanium::authentification::Credentials::from(const nlohmann::json& in, Cr
 		return true;
 	};
 
-	if (json::json_exists(in, "type"))
-		json::extract_json(in, "type", &out.type);
+	if (json::json_exists(in, xorstr_("type")))
+		json::extract_json(in, xorstr_("type"), &out.type);
 
-	if (json::json_exists(in, "client_id"))
-		json::extract_json(in, "client_id", &out.client_id);
+	if (json::json_exists(in, xorstr_("client_id")))
+		json::extract_json(in, xorstr_("client_id"), &out.client_id);
 
 	switch (out.type) {
 	case TOKEN_METHOD::EPIC_AUTHORIZATION_CODE:
-		extract_key("authorization_code", &out.authorization_code);
+		extract_key(xorstr_("authorization_code"), &out.authorization_code);
 		break;
 	case TOKEN_METHOD::EPIC_DEVICE_AUTH:
-		extract_key("secret", &out.secret);
-		extract_key("deviceId", &out.deviceId);
-		extract_key("accountId", &out.accountId);
+		extract_key(xorstr_("secret"), &out.secret);
+		extract_key(xorstr_("deviceId"), &out.deviceId);
+		extract_key(xorstr_("accountId"), &out.accountId);
 		break;
 	case TOKEN_METHOD::EPIC_DEVICE_CODE:
-		extract_key("device_code", &out.device_code);
+		extract_key(xorstr_("device_code"), &out.device_code);
 		break;
 	case TOKEN_METHOD::EPIC_EXCHANGE_CODE:
-		extract_key("exchange_code", &out.exchange_code);
+		extract_key(xorstr_("exchange_code"), &out.exchange_code);
 		break;
 	case TOKEN_METHOD::EPIC_REFRESH_TOKEN:
-		extract_key("refresh_token", &out.refresh_token);
+		extract_key(xorstr_("refresh_token"), &out.refresh_token);
 		break;
 	}
 
@@ -53,29 +53,29 @@ bool platanium::authentification::Credentials::from(const nlohmann::json& in, Cr
 nlohmann::json platanium::authentification::Credentials::to_json(void)
 {
 	nlohmann::json data = {
-		{"client_id", this->client_id},
-		{"type", this->type}
+		{xorstr_("client_id"), this->client_id},
+		{xorstr_("type"), this->type}
 	};
 
 	switch (this->type) {
 	case TOKEN_METHOD::EPIC_AUTHORIZATION_CODE:
-		data["authorization_code"] = this->authorization_code;
+		data[xorstr_("authorization_code")] = this->authorization_code;
 		break;
 	case TOKEN_METHOD::EPIC_DEVICE_AUTH:
-		data["secret"] = this->secret;
-		data["deviceId"] = this->deviceId;
-		data["accountId"] = this->accountId;
+		data[xorstr_("secret")] = this->secret;
+		data[xorstr_("deviceId")] = this->deviceId;
+		data[xorstr_("accountId")] = this->accountId;
 		break;
 	case TOKEN_METHOD::EPIC_DEVICE_CODE:
-		data["device_code"] = this->device_code;
+		data[xorstr_("device_code")] = this->device_code;
 		break;
 	case TOKEN_METHOD::EPIC_EXCHANGE_CODE:
 	//s	extract_key("exchange_code", &out.exchange_code);
-		data["exchange_code"] = this->exchange_code;
+		data[xorstr_("exchange_code")] = this->exchange_code;
 		break;
 	case TOKEN_METHOD::EPIC_REFRESH_TOKEN:
 		//extract_key("refresh_token", &out.refresh_token);
-		data["refresh_token"] = this->refresh_token;
+		data[xorstr_("refresh_token")] = this->refresh_token;
 		break;
 	}
 
@@ -98,7 +98,7 @@ bool platanium::authentification::Credentials::cipher(std::string& out_data)
 
 	if (!CryptProtectData(&raw_blob, NULL, NULL, NULL, NULL, CRYPTPROTECT_LOCAL_MACHINE, &out))
 	{
-		spdlog::error("Failed to crypt data");
+		spdlog::error(xorstr_("Failed to crypt data"));
 		error::set_last_error(error::FAILED_TO_CIPHER_DATA);
 		return false;
 	}
@@ -120,9 +120,9 @@ bool platanium::authentification::Credentials::uncipher(const std::string in, Cr
 
 	if (!CryptUnprotectData(&raw_blob, NULL, NULL, NULL, NULL, CRYPTPROTECT_LOCAL_MACHINE, &out_data))
 	{
-		spdlog::error("Failed to decrypt data");
+		spdlog::error(xorstr_("Failed to decrypt data"));
 		error::set_last_error(error::FAILED_TO_UNCIPHER_DATA);
-		throw std::runtime_error("Failed to decrypt data");
+		throw std::runtime_error(xorstr_("Failed to decrypt data"));
 	}
 
 	std::string json_raw = std::string((char*)out_data.pbData, out_data.cbData);
