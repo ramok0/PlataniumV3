@@ -39,6 +39,24 @@ namespace platanium {
 		METHOD_UNKNOWN
 	};
 
+	enum class CLIENT_TYPE {
+		PLATANIUM_LAUNCHER, //Launcher
+		PLATANIUM_CLIENT, //DLL,
+		PLATANIUM_OTHER //some others tools
+	};
+
+	inline CLIENT_TYPE mod;
+
+	constexpr bool is_launcher(CLIENT_TYPE type = platanium::mod)
+	{
+		return type == CLIENT_TYPE::PLATANIUM_LAUNCHER;
+	}
+
+	constexpr bool is_dll(CLIENT_TYPE type = platanium::mod)
+	{
+		return type == CLIENT_TYPE::PLATANIUM_CLIENT;
+	}
+
 	typedef std::pair<std::string, std::string> Header;
 	typedef std::vector<Header> HeaderContainer;
 	typedef std::pair<const char*, const char*> AuthClient;
@@ -444,6 +462,10 @@ namespace platanium {
 	};
 
 	namespace epic {
+		namespace utils {
+			void kill_anticheats();
+		}
+
 		namespace api {
 			namespace services {
 				const std::string ACCOUNT = "https://account-public-service-prod.ol.epicgames.com/account/api";
@@ -641,7 +663,7 @@ namespace platanium {
 	bool login(const platanium::authentification::Credentials credentials);
 
 	//you should call this function before using platanium
-	extern bool initialize(void);
+	extern bool initialize(CLIENT_TYPE type = CLIENT_TYPE::PLATANIUM_LAUNCHER);
 	//you should call this function when you dont need platanium anymore
 	extern bool destroy(void);
 

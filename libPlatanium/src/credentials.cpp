@@ -17,6 +17,8 @@ bool platanium::authentification::Credentials::from(const nlohmann::json& in, Cr
 				return false;
 			}
 		}
+
+		return true;
 	};
 
 	if (json::json_exists(in, "type"))

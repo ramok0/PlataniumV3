@@ -1,5 +1,5 @@
 #include <platanium.hpp>
-#include <tlhelp32.h>
+#include <regex>
 
 bool platanium::exchange_to(const platanium::AuthClient auth_client)
 {
@@ -52,49 +52,55 @@ bool platanium::login(const platanium::authentification::Credentials credentials
 
 
 
-bool platanium::initialize(void)
+bool platanium::initialize(platanium::CLIENT_TYPE client_type)
 {
-	static std::array<std::wstring, 6> kill_process = { L"EpicGamesLauncher.exe", L"FortniteLauncher.exe", L"FortniteClient-Win64-Shipping.exe",L"FortniteClient-Win64-Shipping_EAC.exe", L"FortniteClient-Win64-Shipping_BE.exe", L"FortniteClient-Win64-Shipping_EAC_EOS.exe" };
+	platanium::mod = client_type;
 
-	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-
-	PROCESSENTRY32 entry;
-	entry.dwSize = sizeof(entry);
-
-	if (Process32First(hSnapshot, &entry))
+	if (platanium::is_launcher())
 	{
-		while (Process32Next(hSnapshot, &entry))
-		{
-			for (auto& process_name : kill_process)
-			{
-				if (std::wstring(entry.szExeFile).contains(process_name))
-				{
-					HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, false, entry.th32ProcessID);
-					TerminateProcess(hProcess, 0);
-					CloseHandle(hProcess);
-				}
-			}
-		}
+		platanium::epic::utils::kill_anticheats();
 	}
-
-	CloseHandle(hSnapshot);
-
-
-
+	
 	platanium::error::set_last_error(error::PLATANIUM_SUCCESS);
 	spdlog::set_level(spdlog::level::trace);
 
-	platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicAuthorizationCodeAuthManager>());
-	platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicRefreshTokenAuthManager>());
-	platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicExchangeCodeAuthManager>());
-	platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicDeviceCodeAuthManager>());
-	platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicDeviceAuthAuthManager>());
+	//dll dont need to auth anyway
+	if (platanium::is_launcher()) {
+		platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicAuthorizationCodeAuthManager>());
+		platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicRefreshTokenAuthManager>());
+		platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicExchangeCodeAuthManager>());
+		platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicDeviceCodeAuthManager>());
+		platanium::auth_managers.push_back(std::make_shared<platanium::authentification::managers::EpicDeviceAuthAuthManager>());
+	}
 
 	platanium::auth_clients.push_back(platanium::epic::api::auth_clients::fortniteIOSGameClient);
 	platanium::auth_clients.push_back(platanium::epic::api::auth_clients::launcherAppClient2);
 	platanium::auth_clients.push_back(platanium::epic::api::auth_clients::fortniteNewSwitchGameClient);
 
-	platanium::configuration = std::make_unique<Configuration>(std::filesystem::current_path() / "config.json");
+	if (platanium::is_launcher())
+	{
+		platanium::configuration = std::make_unique<Configuration>(std::filesystem::current_path() / "config.json");
+	}
+	else if (platanium::is_dll()) {
+		char* data = GetCommandLineA();
+
+		std::regex pattern(R"(-plataniumconfigpath=\"([^\"]+)\")");
+		std::smatch match;
+		std::string sData = std::string(data);
+
+		spdlog::debug("Args : {}", sData);
+
+		if (std::regex_search(sData, match, pattern))
+		{
+			std::filesystem::path path = std::filesystem::path(match[1].str());
+			if (std::filesystem::exists(path))
+			{
+				platanium::configuration = std::make_unique<Configuration>(path);
+			}
+		}
+	}
+
+	if (!platanium::configuration) return false;
 
 	platanium::authentification::account::set_current_account(nullptr);
 

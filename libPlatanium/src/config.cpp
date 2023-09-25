@@ -126,7 +126,7 @@ bool platanium::Configuration::parse(const std::string& str)
 {
 	nlohmann::json doc;
 	try {
-		doc = nlohmann::json::parse(const_cast<std::string&>(str));
+		doc = nlohmann::json::parse(str);
 		spdlog::info("parsed configuration successfully");
 	}
 	catch (const nlohmann::json::parse_error&) {

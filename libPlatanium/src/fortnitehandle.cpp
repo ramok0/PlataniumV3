@@ -83,16 +83,13 @@ bool platanium::epic::FortniteHandle::suspend(void)
 
 bool platanium::epic::FortniteHandle::resume(void)
 {
-	if (!this->is_suspended()) return true;
-
+	spdlog::debug("trying to resume app..");
 	return NT_SUCCESS(windows::NtResumeProcess(this->get_process_info()->hProcess));
 }
 
 bool platanium::epic::FortniteHandle::inject(std::filesystem::path dll_path)
 {
 	if (!this->is_alive()) return false;
-
-	this->suspend(); //try to suspend fortnite
 
 	std::string dll_path_string = dll_path.string();
 	size_t dll_path_size = dll_path_string.size();
@@ -118,6 +115,10 @@ bool platanium::epic::FortniteHandle::inject(std::filesystem::path dll_path)
 		spdlog::error("Failed to create Thread");
 		return false;
 	}
+
+	VirtualFreeEx(this->get_process_info()->hProcess, lpPathAddress, dll_path_size + 1, MEM_RELEASE);
+
+	spdlog::info("thread has been created");
 
 	return true;
 }

@@ -113,6 +113,8 @@ platanium::epic::FortniteHandle* platanium::epic::Fortnite::start(const std::str
 		return nullptr;
 	}
 
+	platanium::epic::utils::kill_anticheats();
+
 	std::filesystem::path binary_path = this->get_binary_path();
 
 	STARTUPINFOA startup_info;

@@ -44,6 +44,7 @@
     <ClCompile Include="src\launcherinstalled.cpp" />
     <ClCompile Include="src\platanium.cpp" />
     <ClCompile Include="src\rest.cpp" />
+    <ClCompile Include="src\utils.cpp" />
     <ClCompile Include="src\windows.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -103,6 +104,7 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgUseMD>false</VcpkgUseMD>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -165,6 +167,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>
