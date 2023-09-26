@@ -2,22 +2,20 @@
 
 std::string platanium::epic::Fortnite::get_start_arguments(platanium::ArgumentContainer override_arguments)
 {
-	static std::array<std::pair<std::string, std::optional<std::string>>, 15> default_arguments {
-		std::make_pair(xorstr_("frombe"), std::nullopt),
+	static std::array<std::pair<std::string, std::optional<std::string>>, 13> default_arguments {
 		std::make_pair(xorstr_("EpicPortal"), std::nullopt),
-		std::make_pair(xorstr_("AUTH_LOGIN"), "unused"),
+		std::make_pair(xorstr_("AUTH_LOGIN"), xorstr_("unused")),
 		std::make_pair(xorstr_("AUTH_PASSWORD"), std::nullopt),
-		std::make_pair(xorstr_("AUTH_TYPE"), "exchangecode"),
-		std::make_pair(xorstr_("epicapp"), "Fortnite"),
-		std::make_pair(xorstr_("epicenv"), "Prod"),
+		std::make_pair(xorstr_("AUTH_TYPE"), xorstr_("exchangecode")),
+		std::make_pair(xorstr_("epicapp"), xorstr_("Fortnite")),
+		std::make_pair(xorstr_("epicenv"), xorstr_("Prod")),
 		std::make_pair(xorstr_("epicusername"), std::nullopt),
 		std::make_pair(xorstr_("epicuserid"), std::nullopt),
-		std::make_pair(xorstr_("noeac"), std::nullopt),
-		std::make_pair(xorstr_("noeaceos"), std::nullopt),
 		std::make_pair(xorstr_("fromfl"), std::nullopt),
 		std::make_pair(xorstr_("caldera"), std::nullopt),
-		std::make_pair(xorstr_("frombe"), std::nullopt),
+		std::make_pair(xorstr_("epicsandboxid"), xorstr_("fn")),
 		std::make_pair(xorstr_("plataniumconfigpath"), std::nullopt),
+		std::make_pair(xorstr_("obfuscationid"), "Epy0GaQU3WUOcTmtT0--0P2_vOixxg"),
 	};
 
 	platanium::ArgumentContainer arguments;
@@ -113,6 +111,10 @@ platanium::epic::FortniteHandle* platanium::epic::Fortnite::start(const std::str
 		return nullptr;
 	}
 
+	auto generateArgs = [](const std::string& binary_name, const std::string& args) {
+		return "\"" + binary_name + "\" " + args;
+	};
+
 	platanium::epic::utils::kill_anticheats();
 
 	std::filesystem::path binary_path = this->get_binary_path();
@@ -131,7 +133,7 @@ platanium::epic::FortniteHandle* platanium::epic::Fortnite::start(const std::str
 
 	std::filesystem::path parent_path = binary_path.parent_path();
 
-	if (!CreateProcessA(binary_path.string().c_str(), (char*)arguments.c_str(), nullptr, nullptr, false, CREATE_SUSPENDED | DETACHED_PROCESS, NULL, parent_path.string().c_str(), &startup_info, &process_info))
+	if (!CreateProcessA(NULL, (char*)generateArgs(binary_path.string(), arguments).c_str(), nullptr, nullptr, false, CREATE_SUSPENDED | DETACHED_PROCESS, NULL, parent_path.string().c_str(), &startup_info, &process_info))
 	{
 		error::set_last_error(error::FAILED_TO_START_PROCESS);
 		spdlog::error("Failed to start process, OS error code : {}", GetLastError());
@@ -142,7 +144,7 @@ platanium::epic::FortniteHandle* platanium::epic::Fortnite::start(const std::str
 
 	for (auto& path : anti_cheats_paths)
 	{
-		if (!CreateProcessA((parent_path / path).string().c_str(), (char*)arguments.c_str(), nullptr, nullptr, false, CREATE_SUSPENDED | DETACHED_PROCESS, NULL, parent_path.string().c_str(), &antiCheatStartupInfo, &antiCheatProcessInfo))
+		if (!CreateProcessA(NULL, (char*)generateArgs((parent_path / path).string(), arguments).c_str(), nullptr, nullptr, false, CREATE_SUSPENDED | DETACHED_PROCESS, NULL, parent_path.string().c_str(), &antiCheatStartupInfo, &antiCheatProcessInfo))
 		{
 			continue;
 		}

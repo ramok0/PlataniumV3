@@ -64,12 +64,27 @@ platanium::ArgumentContainer platanium::authentification::account::EpicGamesAcco
 	const EpicGamesAccount::Caldera caldera = this->request_anti_cheat_provider();
 
 	platanium::ArgumentContainer arguments;
-	arguments.push_back(std::make_pair(xorstr_("AUTH_PASSWORD"), exchange_code));
-	arguments.push_back(std::make_pair(xorstr_("epicusername"), this->get_details().display_name));
-	arguments.push_back(std::make_pair(xorstr_("epicuserid"), this->get_details().account_id));
-	arguments.push_back(std::make_pair(xorstr_("fromfl"), caldera.provider));
-	arguments.push_back(std::make_pair(xorstr_("caldera"), caldera.jwt));
-	arguments.push_back(std::make_pair(xorstr_("plataniumconfigpath"), "\"" + platanium::configuration->get_path().string() + "\""));
+	arguments.push_back(std::make_pair(("AUTH_PASSWORD"), exchange_code));
+	arguments.push_back(std::make_pair(("epicusername"), this->get_details().display_name));
+	arguments.push_back(std::make_pair(("epicuserid"), this->get_details().account_id));
+	arguments.push_back(std::make_pair(("fromfl"), caldera.provider));
+	arguments.push_back(std::make_pair(("caldera"), caldera.jwt));
+	arguments.push_back(std::make_pair(("plataniumconfigpath"), "\"" + platanium::configuration->get_path().string() + "\""));
+
+	if (caldera.provider == "eaceos")
+	{
+		arguments.push_back(std::make_pair(("nobe"), std::nullopt));
+		arguments.push_back(std::make_pair(("noeac"), std::nullopt));
+	}
+	else if (caldera.provider == "eac")
+	{
+		arguments.push_back(std::make_pair(("noeaceos"), std::nullopt));
+		arguments.push_back(std::make_pair(("nobe"), std::nullopt));
+	}
+	else { //be
+		arguments.push_back(std::make_pair(("noeaceos"), std::nullopt));
+		arguments.push_back(std::make_pair(("noeac"), std::nullopt));
+	}
 
 	return arguments;
 }
